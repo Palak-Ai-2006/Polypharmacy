@@ -1,0 +1,541 @@
+{
+  "warfarin": {
+    "enzymes": [
+      {
+        "enzyme": "CYP2C9",
+        "role": "substrate",
+        "strength": "sensitive"
+      },
+      {
+        "enzyme": "CYP3A4",
+        "role": "substrate",
+        "strength": "moderate"
+      }
+    ],
+    "clinical_note": "Narrow therapeutic index \u2014 small changes in metabolism cause bleeding or clotting"
+  },
+  "fluoxetine": {
+    "enzymes": [
+      {
+        "enzyme": "CYP2D6",
+        "role": "inhibitor",
+        "strength": "strong"
+      },
+      {
+        "enzyme": "CYP2C19",
+        "role": "inhibitor",
+        "strength": "moderate"
+      },
+      {
+        "enzyme": "CYP2D6",
+        "role": "substrate",
+        "strength": "sensitive"
+      }
+    ],
+    "clinical_note": "Strong CYP2D6 inhibitor \u2014 blocks codeine activation, affects metoprolol levels"
+  },
+  "codeine": {
+    "enzymes": [
+      {
+        "enzyme": "CYP2D6",
+        "role": "substrate",
+        "strength": "sensitive"
+      }
+    ],
+    "clinical_note": "Prodrug \u2014 requires CYP2D6 to convert to morphine. Ineffective in poor metabolizers."
+  },
+  "omeprazole": {
+    "enzymes": [
+      {
+        "enzyme": "CYP2C19",
+        "role": "substrate",
+        "strength": "sensitive"
+      },
+      {
+        "enzyme": "CYP2C19",
+        "role": "inhibitor",
+        "strength": "moderate"
+      }
+    ],
+    "clinical_note": "Metabolized faster in CYP2C19 rapid/ultrarapid metabolizers \u2014 may be ineffective"
+  },
+  "clopidogrel": {
+    "enzymes": [
+      {
+        "enzyme": "CYP2C19",
+        "role": "substrate",
+        "strength": "sensitive"
+      }
+    ],
+    "clinical_note": "Prodrug \u2014 requires CYP2C19 activation. Poor metabolizers at risk of treatment failure."
+  },
+  "simvastatin": {
+    "enzymes": [
+      {
+        "enzyme": "CYP3A4",
+        "role": "substrate",
+        "strength": "sensitive"
+      }
+    ],
+    "clinical_note": "CYP3A4 inhibitors increase statin levels \u2014 risk of rhabdomyolysis"
+  },
+  "fluconazole": {
+    "enzymes": [
+      {
+        "enzyme": "CYP2C9",
+        "role": "inhibitor",
+        "strength": "strong"
+      },
+      {
+        "enzyme": "CYP2C19",
+        "role": "inhibitor",
+        "strength": "strong"
+      },
+      {
+        "enzyme": "CYP3A4",
+        "role": "inhibitor",
+        "strength": "moderate"
+      }
+    ],
+    "clinical_note": "Potent multi-enzyme inhibitor \u2014 dangerous with warfarin, statins, many others"
+  },
+  "metoprolol": {
+    "enzymes": [
+      {
+        "enzyme": "CYP2D6",
+        "role": "substrate",
+        "strength": "sensitive"
+      }
+    ],
+    "clinical_note": "CYP2D6 poor metabolizers accumulate metoprolol \u2014 risk of excessive bradycardia"
+  },
+  "aspirin": {
+    "enzymes": [],
+    "clinical_note": "No significant CYP interaction \u2014 but additive bleeding risk with warfarin"
+  },
+  "rifampin": {
+    "enzymes": [
+      {
+        "enzyme": "CYP3A4",
+        "role": "inducer",
+        "strength": "strong"
+      },
+      {
+        "enzyme": "CYP2C9",
+        "role": "inducer",
+        "strength": "strong"
+      },
+      {
+        "enzyme": "CYP2C19",
+        "role": "inducer",
+        "strength": "strong"
+      }
+    ],
+    "clinical_note": "Most potent CYP inducer known \u2014 drastically reduces levels of nearly all co-administered drugs"
+  },
+  "paroxetine": {
+    "enzymes": [
+      {
+        "enzyme": "CYP2D6",
+        "role": "inhibitor",
+        "strength": "strong"
+      },
+      {
+        "enzyme": "CYP2D6",
+        "role": "substrate",
+        "strength": "sensitive"
+      }
+    ],
+    "clinical_note": "Paroxetine is both a sensitive CYP2D6 substrate and a strong inhibitor, creating a self-inhibiting pharmacokinetic profile that increases its own exposure at higher doses."
+  },
+  "sertraline": {
+    "enzymes": [
+      {
+        "enzyme": "CYP2D6",
+        "role": "inhibitor",
+        "strength": "moderate"
+      },
+      {
+        "enzyme": "CYP2C19",
+        "role": "inhibitor",
+        "strength": "weak"
+      },
+      {
+        "enzyme": "CYP2C9",
+        "role": "inhibitor",
+        "strength": "weak"
+      }
+    ],
+    "clinical_note": "Sertraline moderately inhibits CYP2D6 at higher doses, warranting caution when combined with narrow-therapeutic-index substrates such as TCAs or antiarrhythmics."
+  },
+  "amitriptyline": {
+    "enzymes": [
+      {
+        "enzyme": "CYP2D6",
+        "role": "substrate",
+        "strength": "sensitive"
+      },
+      {
+        "enzyme": "CYP2C19",
+        "role": "substrate",
+        "strength": "sensitive"
+      },
+      {
+        "enzyme": "CYP3A4",
+        "role": "substrate",
+        "strength": "weak"
+      }
+    ],
+    "clinical_note": "Amitriptyline is a sensitive substrate of both CYP2D6 and CYP2C19, and poor metabolizers or patients on strong inhibitors are at elevated risk for QTc prolongation and anticholinergic toxicity."
+  },
+  "risperidone": {
+    "enzymes": [
+      {
+        "enzyme": "CYP2D6",
+        "role": "substrate",
+        "strength": "sensitive"
+      },
+      {
+        "enzyme": "CYP3A4",
+        "role": "substrate",
+        "strength": "moderate"
+      }
+    ],
+    "clinical_note": "Risperidone is primarily metabolized by CYP2D6 to its active metabolite 9-hydroxyrisperidone, and CYP2D6 poor metabolizers or patients on strong inhibitors may experience elevated antipsychotic exposure and extrapyramidal side effects."
+  },
+  "haloperidol": {
+    "enzymes": [
+      {
+        "enzyme": "CYP2D6",
+        "role": "substrate",
+        "strength": "sensitive"
+      },
+      {
+        "enzyme": "CYP3A4",
+        "role": "substrate",
+        "strength": "moderate"
+      }
+    ],
+    "clinical_note": "Haloperidol is a sensitive CYP2D6 substrate, and co-administration with CYP2D6 inhibitors or in poor metabolizers increases the risk of QTc prolongation and extrapyramidal effects."
+  },
+  "propranolol": {
+    "enzymes": [
+      {
+        "enzyme": "CYP2D6",
+        "role": "substrate",
+        "strength": "sensitive"
+      },
+      {
+        "enzyme": "CYP2C19",
+        "role": "substrate",
+        "strength": "moderate"
+      }
+    ],
+    "clinical_note": "Propranolol undergoes significant first-pass metabolism via CYP2D6 and CYP2C19, and inhibition of either pathway can lead to increased plasma levels and enhanced beta-blocking effects."
+  },
+  "tramadol": {
+    "enzymes": [
+      {
+        "enzyme": "CYP2D6",
+        "role": "substrate",
+        "strength": "sensitive"
+      },
+      {
+        "enzyme": "CYP3A4",
+        "role": "substrate",
+        "strength": "moderate"
+      }
+    ],
+    "clinical_note": "Tramadol is activated to its more potent opioid metabolite (O-desmethyltramadol) by CYP2D6, making its analgesic efficacy and toxicity risk highly dependent on CYP2D6 phenotype."
+  },
+  "oxycodone": {
+    "enzymes": [
+      {
+        "enzyme": "CYP2D6",
+        "role": "substrate",
+        "strength": "sensitive"
+      },
+      {
+        "enzyme": "CYP3A4",
+        "role": "substrate",
+        "strength": "moderate"
+      }
+    ],
+    "clinical_note": "Oxycodone is primarily cleared by CYP3A4 and partially activated to oxymorphone by CYP2D6; concurrent use of CYP3A4 inhibitors can substantially increase oxycodone exposure and risk of respiratory depression."
+  },
+  "tamoxifen": {
+    "enzymes": [
+      {
+        "enzyme": "CYP2D6",
+        "role": "substrate",
+        "strength": "sensitive"
+      },
+      {
+        "enzyme": "CYP3A4",
+        "role": "substrate",
+        "strength": "moderate"
+      },
+      {
+        "enzyme": "CYP2C9",
+        "role": "substrate",
+        "strength": "weak"
+      }
+    ],
+    "clinical_note": "Tamoxifen requires CYP2D6-mediated conversion to its active metabolite endoxifen for therapeutic efficacy in breast cancer; strong CYP2D6 inhibitors such as paroxetine significantly reduce endoxifen levels and should be avoided."
+  },
+  "citalopram": {
+    "enzymes": [
+      {
+        "enzyme": "CYP2C19",
+        "role": "substrate",
+        "strength": "sensitive"
+      },
+      {
+        "enzyme": "CYP2D6",
+        "role": "substrate",
+        "strength": "moderate"
+      },
+      {
+        "enzyme": "CYP3A4",
+        "role": "substrate",
+        "strength": "weak"
+      }
+    ],
+    "clinical_note": "Citalopram is a sensitive CYP2C19 substrate, and poor metabolizers or patients on CYP2C19 inhibitors are at increased risk of dose-dependent QTc prolongation."
+  },
+  "escitalopram": {
+    "enzymes": [
+      {
+        "enzyme": "CYP2C19",
+        "role": "substrate",
+        "strength": "sensitive"
+      },
+      {
+        "enzyme": "CYP2D6",
+        "role": "substrate",
+        "strength": "moderate"
+      },
+      {
+        "enzyme": "CYP3A4",
+        "role": "substrate",
+        "strength": "weak"
+      }
+    ],
+    "clinical_note": "Escitalopram is a sensitive CYP2C19 substrate with a dose-dependent QTc risk that is amplified in CYP2C19 poor metabolizers or when co-administered with CYP2C19 inhibitors such as omeprazole."
+  },
+  "esomeprazole": {
+    "enzymes": [
+      {
+        "enzyme": "CYP2C19",
+        "role": "substrate",
+        "strength": "sensitive"
+      },
+      {
+        "enzyme": "CYP2C19",
+        "role": "inhibitor",
+        "strength": "moderate"
+      },
+      {
+        "enzyme": "CYP3A4",
+        "role": "substrate",
+        "strength": "weak"
+      }
+    ],
+    "clinical_note": "Esomeprazole, the S-enantiomer of omeprazole, is a sensitive CYP2C19 substrate and moderate inhibitor that carries the same concern as omeprazole regarding impaired clopidogrel activation and cardiovascular outcomes."
+  },
+  "diazepam": {
+    "enzymes": [
+      {
+        "enzyme": "CYP2C19",
+        "role": "substrate",
+        "strength": "sensitive"
+      },
+      {
+        "enzyme": "CYP3A4",
+        "role": "substrate",
+        "strength": "moderate"
+      }
+    ],
+    "clinical_note": "Diazepam is a sensitive CYP2C19 substrate whose clearance is significantly reduced in poor metabolizers or when co-administered with CYP2C19 inhibitors, leading to prolonged sedation and accumulation."
+  },
+  "venlafaxine": {
+    "enzymes": [
+      {
+        "enzyme": "CYP2D6",
+        "role": "substrate",
+        "strength": "sensitive"
+      },
+      {
+        "enzyme": "CYP2C19",
+        "role": "substrate",
+        "strength": "moderate"
+      },
+      {
+        "enzyme": "CYP3A4",
+        "role": "substrate",
+        "strength": "weak"
+      }
+    ],
+    "clinical_note": "Venlafaxine is a sensitive CYP2D6 substrate metabolized to its active form O-desmethylvenlafaxine; strong CYP2D6 inhibitors can increase parent drug exposure, elevating blood pressure and serotonergic effects."
+  },
+  "phenytoin": {
+    "enzymes": [
+      {
+        "enzyme": "CYP2C9",
+        "role": "substrate",
+        "strength": "sensitive"
+      },
+      {
+        "enzyme": "CYP2C19",
+        "role": "substrate",
+        "strength": "moderate"
+      },
+      {
+        "enzyme": "CYP3A4",
+        "role": "inducer",
+        "strength": "moderate"
+      },
+      {
+        "enzyme": "CYP2C9",
+        "role": "inducer",
+        "strength": "moderate"
+      }
+    ],
+    "clinical_note": "Phenytoin is a sensitive CYP2C9 substrate with saturable (zero-order) kinetics and also a broad inducer of CYP3A4 and CYP2C9, creating complex bidirectional interactions with many co-administered drugs."
+  },
+  "ibuprofen": {
+    "enzymes": [
+      {
+        "enzyme": "CYP2C9",
+        "role": "substrate",
+        "strength": "sensitive"
+      }
+    ],
+    "clinical_note": "Ibuprofen is a sensitive CYP2C9 substrate, and its co-administration with CYP2C9 inhibitors or in poor metabolizers can increase NSAID exposure, raising the risk of gastrointestinal and renal adverse effects."
+  },
+  "celecoxib": {
+    "enzymes": [
+      {
+        "enzyme": "CYP2C9",
+        "role": "substrate",
+        "strength": "sensitive"
+      },
+      {
+        "enzyme": "CYP2D6",
+        "role": "inhibitor",
+        "strength": "moderate"
+      }
+    ],
+    "clinical_note": "Celecoxib is a sensitive CYP2C9 substrate and a moderate CYP2D6 inhibitor; caution is warranted when combining it with narrow-therapeutic-index CYP2D6 substrates such as tricyclics or antiarrhythmics."
+  },
+  "losartan": {
+    "enzymes": [
+      {
+        "enzyme": "CYP2C9",
+        "role": "substrate",
+        "strength": "sensitive"
+      },
+      {
+        "enzyme": "CYP3A4",
+        "role": "substrate",
+        "strength": "moderate"
+      }
+    ],
+    "clinical_note": "Losartan requires CYP2C9-mediated conversion to its active carboxylic acid metabolite (E-3174) for antihypertensive and cardioprotective effects; CYP2C9 poor metabolizers have significantly reduced efficacy."
+  },
+  "quetiapine": {
+    "enzymes": [
+      {
+        "enzyme": "CYP3A4",
+        "role": "substrate",
+        "strength": "sensitive"
+      }
+    ],
+    "clinical_note": "Quetiapine is a sensitive CYP3A4 substrate; co-administration with strong CYP3A4 inhibitors such as clarithromycin can dramatically increase quetiapine exposure, raising the risk of QTc prolongation and sedation."
+  },
+  "atorvastatin": {
+    "enzymes": [
+      {
+        "enzyme": "CYP3A4",
+        "role": "substrate",
+        "strength": "sensitive"
+      }
+    ],
+    "clinical_note": "Atorvastatin is a sensitive CYP3A4 substrate, and although more resistant than simvastatin to CYP3A4 inhibitor interactions, dose reduction is still required when co-administered with strong CYP3A4 inhibitors to prevent myopathy."
+  },
+  "apixaban": {
+    "enzymes": [
+      {
+        "enzyme": "CYP3A4",
+        "role": "substrate",
+        "strength": "sensitive"
+      }
+    ],
+    "clinical_note": "Apixaban is a sensitive CYP3A4 substrate, and combined use with strong CYP3A4 inhibitors or inducers significantly alters anticoagulant exposure, increasing bleeding risk or thromboembolic risk respectively."
+  },
+  "amlodipine": {
+    "enzymes": [
+      {
+        "enzyme": "CYP3A4",
+        "role": "substrate",
+        "strength": "sensitive"
+      }
+    ],
+    "clinical_note": "Amlodipine is a sensitive CYP3A4 substrate with a long half-life; strong CYP3A4 inhibitors can increase amlodipine exposure and potentiate hypotension, while inducers may reduce its antihypertensive efficacy."
+  },
+  "clarithromycin": {
+    "enzymes": [
+      {
+        "enzyme": "CYP3A4",
+        "role": "inhibitor",
+        "strength": "strong"
+      },
+      {
+        "enzyme": "CYP3A4",
+        "role": "substrate",
+        "strength": "moderate"
+      }
+    ],
+    "clinical_note": "Clarithromycin is a potent CYP3A4 inhibitor that substantially increases plasma levels of co-administered CYP3A4 substrates, with particularly dangerous interactions reported with statins, QT-prolonging agents, and immunosuppressants."
+  },
+  "diltiazem": {
+    "enzymes": [
+      {
+        "enzyme": "CYP3A4",
+        "role": "inhibitor",
+        "strength": "moderate"
+      },
+      {
+        "enzyme": "CYP3A4",
+        "role": "substrate",
+        "strength": "moderate"
+      }
+    ],
+    "clinical_note": "Diltiazem is both a moderate CYP3A4 inhibitor and substrate, creating clinically meaningful elevations in levels of co-administered CYP3A4 substrates such as statins, cyclosporine, and certain antiarrhythmics."
+  },
+  "carbamazepine": {
+    "enzymes": [
+      {
+        "enzyme": "CYP3A4",
+        "role": "inducer",
+        "strength": "strong"
+      },
+      {
+        "enzyme": "CYP2C9",
+        "role": "inducer",
+        "strength": "moderate"
+      },
+      {
+        "enzyme": "CYP2C19",
+        "role": "inducer",
+        "strength": "moderate"
+      },
+      {
+        "enzyme": "CYP3A4",
+        "role": "substrate",
+        "strength": "sensitive"
+      }
+    ],
+    "clinical_note": "Carbamazepine is a potent CYP3A4 inducer that also induces its own metabolism (autoinduction), reducing its own plasma levels over the first several weeks of therapy while substantially lowering levels of many co-administered drugs."
+  }
+}

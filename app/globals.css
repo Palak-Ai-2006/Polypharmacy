@@ -1,0 +1,170 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  /* PolyPGx Color Palette - from Sanzo Wada */
+  --bg-primary: #FDFBF7;
+  --bg-card: #FFFFFF;
+  --bg-muted: #F4F1EB;
+  --text-primary: #12354E;
+  --text-secondary: #5A6B7A;
+  --accent-primary: #064F6E;
+  --accent-secondary: #F99D1B;
+  --accent-warm: #F5F5B8;
+  --accent-pale: #A7D4E4;
+  --risk-critical: #C0392B;
+  --risk-high: #E67E22;
+  --risk-moderate: #F99D1B;
+  --risk-low: #27AE60;
+  --risk-none: #A7D4E4;
+
+  /* Map to shadcn design tokens */
+  --background: #FDFBF7;
+  --foreground: #12354E;
+  --card: #FFFFFF;
+  --card-foreground: #12354E;
+  --popover: #FFFFFF;
+  --popover-foreground: #12354E;
+  --primary: #064F6E;
+  --primary-foreground: #FFFFFF;
+  --secondary: #F4F1EB;
+  --secondary-foreground: #12354E;
+  --muted: #F4F1EB;
+  --muted-foreground: #5A6B7A;
+  --accent: #A7D4E4;
+  --accent-foreground: #12354E;
+  --destructive: #C0392B;
+  --destructive-foreground: #FFFFFF;
+  --border: #E8E4DC;
+  --input: #A7D4E4;
+  --ring: #064F6E;
+  --chart-1: #064F6E;
+  --chart-2: #F99D1B;
+  --chart-3: #27AE60;
+  --chart-4: #E67E22;
+  --chart-5: #C0392B;
+  --radius: 0.75rem;
+  --sidebar: #FDFBF7;
+  --sidebar-foreground: #12354E;
+  --sidebar-primary: #064F6E;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #F4F1EB;
+  --sidebar-accent-foreground: #12354E;
+  --sidebar-border: #E8E4DC;
+  --sidebar-ring: #064F6E;
+}
+
+.dark {
+  /* Keep same palette for now - app is light-only by design */
+  --background: #FDFBF7;
+  --foreground: #12354E;
+  --card: #FFFFFF;
+  --card-foreground: #12354E;
+  --popover: #FFFFFF;
+  --popover-foreground: #12354E;
+  --primary: #064F6E;
+  --primary-foreground: #FFFFFF;
+  --secondary: #F4F1EB;
+  --secondary-foreground: #12354E;
+  --muted: #F4F1EB;
+  --muted-foreground: #5A6B7A;
+  --accent: #A7D4E4;
+  --accent-foreground: #12354E;
+  --destructive: #C0392B;
+  --destructive-foreground: #FFFFFF;
+  --border: #E8E4DC;
+  --input: #A7D4E4;
+  --ring: #064F6E;
+  --chart-1: #064F6E;
+  --chart-2: #F99D1B;
+  --chart-3: #27AE60;
+  --chart-4: #E67E22;
+  --chart-5: #C0392B;
+  --sidebar: #FDFBF7;
+  --sidebar-foreground: #12354E;
+  --sidebar-primary: #064F6E;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #F4F1EB;
+  --sidebar-accent-foreground: #12354E;
+  --sidebar-border: #E8E4DC;
+  --sidebar-ring: #064F6E;
+}
+
+@theme inline {
+  --font-sans: var(--font-inter), 'Inter', system-ui, sans-serif;
+  --font-mono: 'Geist Mono', 'Geist Mono Fallback';
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* PolyPGx staggered fade-in animations */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-section-1 { animation: fadeInUp 300ms ease-out 0ms both; }
+.animate-section-2 { animation: fadeInUp 300ms ease-out 80ms both; }
+.animate-section-3 { animation: fadeInUp 300ms ease-out 160ms both; }
+.animate-section-4 { animation: fadeInUp 300ms ease-out 240ms both; }
+
+/* Scale-in for drug chips */
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+.animate-scale-in { animation: scaleIn 150ms ease-out both; }
+
+/* Hidden scrollbar utility */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
