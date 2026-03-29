@@ -289,26 +289,12 @@ export default function PolyPGxPage() {
     setSelectedDrugs((prev) => prev.filter((d) => d.rxcui !== rxcui))
   }
 
-  const loadDemo = async (demo: typeof DEMOS[number]) => {
+  const loadDemo = (demo: typeof DEMOS[number]) => {
     setSelectedDrugs(demo.drugs)
     setGeneticProfile(demo.fallbackProfile)
     setReportUrl(demo.reportPath)
     setShowAnalysis(false)
     setAnalysisResult(null)
-    setIsParsing(true)
-    try {
-      const res = await fetch("/api/parse-pgx-report", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ reportUrl: demo.reportPath }),
-      })
-      const data = await res.json()
-      if (!data.error) setGeneticProfile((p) => ({ ...p, ...data }))
-    } catch {
-      // fallbackProfile already set above
-    } finally {
-      setIsParsing(false)
-    }
   }
 
   const analyzeInteractions = async () => {

@@ -1,18 +1,14 @@
 // ============================================================
 // RAG Retriever — queries ChromaDB for relevant clinical docs
+// (CPIC guidelines, PharmGKB annotations).
+// Uses DefaultEmbeddingFunction (local, no API key needed).
+// Gracefully returns "" if ChromaDB is not running.
 // ============================================================
 
 import { ChromaClient } from "chromadb";
+import { DefaultEmbeddingFunction } from "@chroma-core/default-embed";
 
 const COLLECTION_NAME = "pharmgkb_cpic";
-let client: ChromaClient | null = null;
-
-function getClient(): ChromaClient {
-  if (!client) {
-    client = new ChromaClient({ path: "http://localhost:8000" });
-  }
-  return client;
-}
 
 /**
  * Retrieves relevant PharmGKB/CPIC documents for a given drug list.
@@ -20,15 +16,18 @@ function getClient(): ChromaClient {
  */
 export async function retrieveRAGContext(drugs: string[]): Promise<string> {
   try {
-    const chroma = getClient();
-    const collection = await chroma.getCollection({ name: COLLECTION_NAME });
+    const client = new ChromaClient({ host: "localhost", port: 8000, ssl: false });
+    const embedder = new DefaultEmbeddingFunction();
 
-    // Build query from drug names
+    const collection = await client.getCollection({
+      name: COLLECTION_NAME,
+      embeddingFunction: embedder,
+    });
+
     const query = drugs.join(" ");
-
     const results = await collection.query({
       queryTexts: [query],
-      nResults: 4, // top 4 most relevant chunks
+      nResults: 4,
     });
 
     const docs = results.documents?.[0] ?? [];
@@ -36,14 +35,12 @@ export async function retrieveRAGContext(drugs: string[]): Promise<string> {
 
     if (docs.length === 0) return "";
 
-    const formatted = docs
+    return docs
       .map((doc, i) => {
-        const meta = metas[i] as { source?: string; drugs?: string };
+        const meta = metas[i] as { source?: string };
         return `[${meta?.source ?? "Unknown"}] ${doc}`;
       })
       .join("\n\n");
-
-    return formatted;
   } catch (error) {
     // ChromaDB not running — gracefully skip RAG
     console.warn("ChromaDB unavailable, skipping RAG:", error);

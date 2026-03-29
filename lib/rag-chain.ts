@@ -1,14 +1,10 @@
 // ============================================================
-// Layer 3 & 4: RAG Chain + LLM Reasoning
-// Retrieves context from ChromaDB, enriches with OpenFDA,
-// then sends everything to Gemini for clinical reasoning.
-// ============================================================
-// TODO [CS #1]: Wire up ChromaDB + LangChain retriever
-// For now, this is a stub that calls Gemini directly with
-// the collision map as context. RAG enrichment comes in Block 2.
+// Layer 4: LLM Reasoning via LangChain + Gemini
+// Uses @langchain/google-genai for structured clinical reasoning.
 // ============================================================
 
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
+import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import type {
   CollisionMap,
   PatientInput,
@@ -56,56 +52,78 @@ Output ONLY valid JSON matching this exact structure:
 }`;
 
 /**
- * Calls the LLM with collision data + patient info.
+ * Calls Gemini via LangChain with collision data + patient info.
  * Returns structured analysis.
  */
 export async function runLLMAnalysis(
   patient: PatientInput,
   collisionMap: CollisionMap,
-  ragContext?: string // TODO: pass retrieved PharmGKB docs here
+  ragContext?: string
 ): Promise<LLMAnalysisResult> {
   const apiKey = process.env.GEMINI_API_KEY;
 
   if (!apiKey) {
-    return buildFallbackAnalysis(collisionMap);
+    return buildFallbackAnalysis(collisionMap, "GEMINI_API_KEY not set");
   }
 
-  const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({
-    model: "gemini-2.0-flash",
-    systemInstruction: SYSTEM_PROMPT,
-  });
-
+  // Try models in order — fall through on quota/rate-limit errors only
+  const MODELS = ["gemini-2.5-flash", "gemini-2.0-flash-lite", "gemini-2.0-flash-001"];
   const userMessage = buildUserMessage(patient, collisionMap, ragContext);
+  let lastError = "";
 
-  try {
-    const result = await model.generateContent(userMessage);
-    const text = result.response.text();
+  for (const modelName of MODELS) {
+    try {
+      const model = new ChatGoogleGenerativeAI({ model: modelName, apiKey, temperature: 0 });
 
-    // Extract the outermost JSON object using brace counting (handles nested objects correctly)
-    const start = text.indexOf("{");
-    let jsonStr: string | null = null;
-    if (start !== -1) {
-      let depth = 0;
-      for (let i = start; i < text.length; i++) {
-        if (text[i] === "{") depth++;
-        else if (text[i] === "}") {
-          if (--depth === 0) { jsonStr = text.slice(start, i + 1); break; }
+      const response = await model.invoke([
+        new SystemMessage(SYSTEM_PROMPT),
+        new HumanMessage(userMessage),
+      ]);
+
+      const text = typeof response.content === "string"
+        ? response.content
+        : JSON.stringify(response.content);
+
+      // Extract the outermost JSON object using brace counting
+      const start = text.indexOf("{");
+      let jsonStr: string | null = null;
+      if (start !== -1) {
+        let depth = 0;
+        for (let i = start; i < text.length; i++) {
+          if (text[i] === "{") depth++;
+          else if (text[i] === "}") {
+            if (--depth === 0) { jsonStr = text.slice(start, i + 1); break; }
+          }
         }
       }
-    }
-    if (!jsonStr) {
-      console.error("LLM did not return valid JSON:", text);
-      return buildFallbackAnalysis(collisionMap);
-    }
+      if (!jsonStr) {
+        console.error("LLM did not return valid JSON:", text);
+        return buildFallbackAnalysis(collisionMap, "Model returned non-JSON response");
+      }
 
-    const parsed = JSON.parse(jsonStr) as LLMAnalysisResult;
-    parsed.disclaimer = DISCLAIMER;
-    return parsed;
-  } catch (error) {
-    console.error("LLM call failed:", error);
-    return buildFallbackAnalysis(collisionMap);
+      const parsed = JSON.parse(jsonStr) as LLMAnalysisResult;
+      parsed.disclaimer = DISCLAIMER;
+      return parsed;
+
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error);
+      lastError = msg.slice(0, 200);
+      console.error(`LLM call failed [${modelName}]:`, msg.slice(0, 300));
+
+      // Only fall through to next model on quota/rate-limit/overload
+      // Stop immediately on auth errors (400) — no point trying more models
+      if (msg.includes("400") || msg.includes("API_KEY_INVALID") || msg.includes("expired")) {
+        return buildFallbackAnalysis(collisionMap, "API key invalid or expired — get a new key from aistudio.google.com");
+      }
+      // 429 quota or 503 overload → try next model
+      if (msg.includes("429") || msg.includes("503") || msg.includes("quota")) continue;
+
+      // Unknown error — stop
+      return buildFallbackAnalysis(collisionMap, lastError);
+    }
   }
+
+  return buildFallbackAnalysis(collisionMap, `All models quota-exhausted. Last error: ${lastError}`);
 }
 
 function buildUserMessage(
@@ -155,11 +173,7 @@ function buildUserMessage(
   return parts.join("\n");
 }
 
-/**
- * Fallback analysis when LLM is unavailable.
- * Returns structured output based purely on collision data.
- */
-function buildFallbackAnalysis(collisionMap: CollisionMap): LLMAnalysisResult {
+function buildFallbackAnalysis(collisionMap: CollisionMap, reason?: string): LLMAnalysisResult {
   const issues = collisionMap.collisions
     .filter((c) => c.riskLevel !== "NONE")
     .map((c) => ({
@@ -170,9 +184,12 @@ function buildFallbackAnalysis(collisionMap: CollisionMap): LLMAnalysisResult {
       recommendation: "Consult a clinical pharmacist for review.",
     }));
 
+  const n = collisionMap.collisions.filter((c) => c.riskLevel !== "NONE").length;
   return {
     overallRiskLevel: collisionMap.overallRisk,
-    summary: `Detected ${collisionMap.collisions.filter((c) => c.riskLevel !== "NONE").length} enzyme collision(s). LLM analysis unavailable — showing deterministic results only.`,
+    summary: reason
+      ? `Detected ${n} collision(s). LLM unavailable — ${reason}`
+      : `Detected ${n} collision(s). LLM analysis unavailable — showing deterministic results only.`,
     bottleneckEnzymes: collisionMap.collisions
       .filter((c) => c.riskLevel === "CRITICAL" || c.riskLevel === "HIGH")
       .map((c) => c.enzyme),
