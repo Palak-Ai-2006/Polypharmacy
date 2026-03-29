@@ -22,7 +22,7 @@ export async function retrieveRAGContext(drugs: string[]): Promise<string> {
     Boolean(process.env.CHROMA_TENANT) &&
     Boolean(process.env.CHROMA_DATABASE);
 
-  if (process.env.VERCEL && !process.env.CHROMA_URL && !useCloud) {
+  if (process.env.VERCEL && !useCloud) {
     return "";
   }
 
