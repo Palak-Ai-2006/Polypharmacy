@@ -49,7 +49,10 @@ interface GeneticProfile {
 
 interface EnzymeData {
   enzyme: string
-  drugs: { name: string; role: "substrate" | "inhibitor" | "inducer" }[]
+  substrates: string[]
+  inhibitors: string[]
+  inducers: string[]
+  riskReason: string
   riskLevel: "CRITICAL" | "HIGH" | "MODERATE" | "LOW" | "NONE"
   phenoconversion?: { from: string; to: string }
 }
@@ -253,11 +256,17 @@ export default function PolyPGxPage() {
           data.collisionMap?.collisions?.map(
             (c: {
               enzyme: string
-              drugs: { name: string; role: "substrate" | "inhibitor" | "inducer" }[]
+              substrates: string[]
+              inhibitors: string[]
+              inducers: string[]
+              riskReason: string
               riskLevel: "CRITICAL" | "HIGH" | "MODERATE" | "LOW" | "NONE"
             }) => ({
               enzyme: c.enzyme,
-              drugs: c.drugs,
+              substrates: c.substrates ?? [],
+              inhibitors: c.inhibitors ?? [],
+              inducers: c.inducers ?? [],
+              riskReason: c.riskReason ?? "",
               riskLevel: c.riskLevel,
               phenoconversion: data.collisionMap?.phenoconversions?.find(
                 (p: { enzyme: string }) => p.enzyme === c.enzyme
@@ -654,7 +663,11 @@ export default function PolyPGxPage() {
                               </Badge>
                             </div>
                             <div className="flex flex-wrap gap-1">
-                              {enzyme.drugs.map((drug, idx) => (
+                              {[
+                                ...(enzyme.substrates ?? []).map(d => ({ name: d, role: "substrate" as const })),
+                                ...(enzyme.inhibitors ?? []).map(d => ({ name: d, role: "inhibitor" as const })),
+                                ...(enzyme.inducers ?? []).map(d => ({ name: d, role: "inducer" as const })),
+                              ].map((drug, idx) => (
                                 <span
                                   key={idx}
                                   className={`text-[10px] px-1.5 py-0.5 rounded ${
@@ -669,6 +682,9 @@ export default function PolyPGxPage() {
                                 </span>
                               ))}
                             </div>
+                            {enzyme.riskReason && (
+                              <p className="text-[10px] text-[#5A6B7A] mt-1.5">{enzyme.riskReason}</p>
+                            )}
                           </div>
                         ))}
                       </div>
