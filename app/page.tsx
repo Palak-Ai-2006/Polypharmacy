@@ -198,12 +198,12 @@ function handleSSEEvent(
       }
 
       s.setRawCollisionMap({
-        collisions: data.collisions,
-        phenoconversions: data.phenoconversions,
-        overallRisk: data.overallRisk,
-        unmatchedDrugs: data.unmatchedDrugs,
-        severityScore: data.severityScore,
-      })
+        collisions: data.collisions as unknown,
+        phenoconversions: data.phenoconversions as unknown,
+        overallRisk: data.overallRisk as unknown,
+        unmatchedDrugs: data.unmatchedDrugs as unknown,
+        severityScore: data.severityScore as unknown,
+      } as Record<string, unknown>)
 
       s.setAnalysisResult({
         overallRisk: (data.overallRisk as string) as "CRITICAL" | "HIGH" | "MODERATE" | "LOW" | "NONE",

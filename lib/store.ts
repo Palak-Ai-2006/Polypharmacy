@@ -122,7 +122,7 @@ interface PolyPGxState {
   aiRecommendations: string[]
   streamingReasoning: string
   collisionsReady: boolean
-  rawCollisionMap: unknown
+  rawCollisionMap: Record<string, unknown> | null
   ragContext: string | null
   setIsAnalyzing: (v: boolean) => void
   setAnalysisResult: (v: AnalysisResult | null) => void
@@ -134,7 +134,7 @@ interface PolyPGxState {
   setStreamingReasoning: (v: string) => void
   appendStreamingReasoning: (chunk: string) => void
   setCollisionsReady: (v: boolean) => void
-  setRawCollisionMap: (v: unknown) => void
+  setRawCollisionMap: (v: Record<string, unknown> | null) => void
   setRagContext: (v: string | null) => void
 
   // Physician notes
