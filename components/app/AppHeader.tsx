@@ -12,7 +12,7 @@ export function AppHeader({ showBack, onBack }: AppHeaderProps) {
     <header className="h-10 min-h-10 bg-white border-b border-[#E8E4DC] flex items-center justify-between px-4 shrink-0 print:hidden">
       <div className="flex items-center gap-2">
         <Dna className="h-5 w-5 text-[#064F6E]" />
-        <span className="text-lg font-bold text-[#12354E]">PolyPGx</span>
+        <span className="text-lg font-bold text-[#12354E]">Argus</span>
         <span className="text-[#E8E4DC]">&middot;</span>
         <span className="text-xs text-[#5A6B7A]">Clinical Interaction Analyzer</span>
         {showBack && (
@@ -28,10 +28,7 @@ export function AppHeader({ showBack, onBack }: AppHeaderProps) {
         )}
       </div>
       <div className="flex items-center gap-3">
-        <kbd className="hidden sm:inline-flex items-center gap-1 px-1.5 py-0.5 rounded border border-[#E8E4DC] text-[9px] text-[#5A6B7A] font-mono">
-          Ctrl+K
-        </kbd>
-        <div className="border-l border-[#E8E4DC] pl-3">
+        <div>
           <span className="text-[10px] uppercase tracking-[0.2em] text-[#5A6B7A] font-medium">
             FOR RESEARCH USE ONLY
           </span>
