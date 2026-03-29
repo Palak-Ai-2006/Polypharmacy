@@ -14,13 +14,17 @@ export type MetabolizerPhenotype =
   | "ultrarapid"
   | "unknown";
 
-export type CYPEnzyme = "CYP3A4" | "CYP2D6" | "CYP2C19" | "CYP2C9";
+export type CYPEnzyme = "CYP3A4" | "CYP2D6" | "CYP2C19" | "CYP2C9" | "CYP1A2" | "CYP2B6" | "CYP2E1" | "CYP3A5";
 
 export interface GeneticProfile {
   CYP3A4: MetabolizerPhenotype;
   CYP2D6: MetabolizerPhenotype;
   CYP2C19: MetabolizerPhenotype;
   CYP2C9: MetabolizerPhenotype;
+  CYP1A2?: MetabolizerPhenotype;
+  CYP2B6?: MetabolizerPhenotype;
+  CYP2E1?: MetabolizerPhenotype;
+  CYP3A5?: MetabolizerPhenotype;
 }
 
 export interface PatientInput {
@@ -28,6 +32,10 @@ export interface PatientInput {
   age?: number;
   drugs: string[];           // list of drug names (generic)
   geneticProfile: GeneticProfile;
+  renalFunction?: "normal" | "mild" | "moderate" | "severe";   // eGFR-based
+  hepaticFunction?: "normal" | "child-a" | "child-b" | "child-c"; // Child-Pugh
+  weight?: number;           // kg
+  comorbidities?: string[];  // active diagnoses
 }
 
 // --- CYP DATABASE TYPES (what bio major builds) ---
@@ -137,4 +145,79 @@ export interface AnalyzeResponse {
 export interface RxNormSuggestion {
   rxcui: string;
   name: string;
+}
+
+// --- Severity Scoring (composite risk) ---
+
+export interface SeverityScore {
+  compositeScore: number;       // 0-100
+  riskTier: "CRITICAL" | "HIGH" | "MODERATE" | "LOW" | "MINIMAL";
+  factors: SeverityFactor[];
+  explanation: string;
+}
+
+export interface SeverityFactor {
+  name: string;
+  weight: number;              // 0-1
+  value: number;               // raw score
+  weighted: number;            // weight * value
+  detail: string;
+}
+
+// --- FHIR R4 Resource Types ---
+
+export interface FHIRMedicationRequest {
+  resourceType: "MedicationRequest";
+  id: string;
+  status: "active" | "completed" | "cancelled";
+  intent: "order" | "plan";
+  medicationCodeableConcept: { coding: FHIRCoding[]; text: string };
+  subject: FHIRReference;
+  authoredOn: string;
+}
+
+export interface FHIRObservation {
+  resourceType: "Observation";
+  id: string;
+  status: "final" | "preliminary";
+  category: { coding: FHIRCoding[] }[];
+  code: { coding: FHIRCoding[]; text: string };
+  subject: FHIRReference;
+  valueCodeableConcept?: { coding: FHIRCoding[]; text: string };
+  component?: FHIRObservationComponent[];
+}
+
+export interface FHIRClinicalImpression {
+  resourceType: "ClinicalImpression";
+  id: string;
+  status: "completed";
+  subject: FHIRReference;
+  date: string;
+  summary: string;
+  finding: { itemCodeableConcept: { text: string } }[];
+}
+
+export interface FHIRCoding {
+  system: string;
+  code: string;
+  display: string;
+}
+
+export interface FHIRReference {
+  reference: string;
+  display?: string;
+}
+
+export interface FHIRObservationComponent {
+  code: { coding: FHIRCoding[]; text: string };
+  valueCodeableConcept: { coding: FHIRCoding[]; text: string };
+}
+
+// --- PGx Report Parsing ---
+
+export interface PGxReportResult {
+  source: string;            // "23andMe" | "Tempus" | "OneOme" | "unknown"
+  extractedPhenotypes: Record<string, MetabolizerPhenotype>;
+  rawText: string;
+  confidence: number;        // 0-1
 }

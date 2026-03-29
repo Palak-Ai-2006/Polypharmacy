@@ -1,13 +1,13 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
-import { Toaster } from 'sonner'
+import { Toaster } from '@/components/ui/sonner'
 import './globals.css'
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
-  title: 'Argus - Clinical Drug Interaction Analyzer',
+  title: 'PolyPGx - Clinical Drug Interaction Analyzer',
   description: 'Analyze drug interactions with pharmacogenomic profiling',
   generator: 'v0.app',
   icons: {
@@ -38,7 +38,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} font-sans antialiased`}>
         {children}
-        <Toaster />
+        <Toaster position="bottom-right" richColors closeButton />
         <Analytics />
       </body>
     </html>

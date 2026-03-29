@@ -101,7 +101,7 @@ export async function runLLMAnalysis(
         return buildFallbackAnalysis(collisionMap, "Model returned non-JSON response");
       }
 
-      const parsed = JSON.parse(jsonStr) as LLMAnalysisResult;
+      const parsed = JSON.parse(escapeControlCharsInStrings(jsonStr)) as LLMAnalysisResult;
       parsed.disclaimer = DISCLAIMER;
       return parsed;
 
@@ -124,6 +124,45 @@ export async function runLLMAnalysis(
   }
 
   return buildFallbackAnalysis(collisionMap, `All models quota-exhausted. Last error: ${lastError}`);
+}
+
+// Escapes literal control characters only inside JSON string values.
+// Walks the string char-by-char tracking whether we're inside a JSON string,
+// so structural whitespace (between tokens) is left untouched.
+function escapeControlCharsInStrings(json: string): string {
+  let inString = false;
+  let escaped = false;
+  let result = "";
+  for (let i = 0; i < json.length; i++) {
+    const ch = json[i];
+    if (escaped) {
+      result += ch;
+      escaped = false;
+      continue;
+    }
+    if (ch === "\\") {
+      escaped = true;
+      result += ch;
+      continue;
+    }
+    if (ch === '"') {
+      inString = !inString;
+      result += ch;
+      continue;
+    }
+    if (inString) {
+      const code = ch.charCodeAt(0);
+      if (code < 0x20) {
+        if (ch === "\n") result += "\\n";
+        else if (ch === "\r") result += "\\r";
+        else if (ch === "\t") result += "\\t";
+        // drop other control characters
+        continue;
+      }
+    }
+    result += ch;
+  }
+  return result;
 }
 
 function buildUserMessage(

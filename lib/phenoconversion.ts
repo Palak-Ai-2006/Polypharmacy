@@ -28,7 +28,7 @@ export function applyPhenoconversions(
   enzymeMap: Record<CYPEnzyme, { substrates: string[]; inhibitors: string[]; inducers: string[] }>
 ): PhenoconversionEvent[] {
   const events: PhenoconversionEvent[] = [];
-  const enzymes: CYPEnzyme[] = ["CYP3A4", "CYP2D6", "CYP2C19", "CYP2C9"];
+  const enzymes: CYPEnzyme[] = ["CYP3A4", "CYP2D6", "CYP2C19", "CYP2C9", "CYP1A2", "CYP2B6", "CYP2E1", "CYP3A5"];
 
   for (const enzyme of enzymes) {
     const inhibitors = enzymeMap[enzyme].inhibitors;
@@ -38,7 +38,7 @@ export function applyPhenoconversions(
     if (!hasStrongInhibitor && !hasModerateInhibitor) continue;
 
     const originalPhenotype = patient.geneticProfile[enzyme];
-    if (originalPhenotype === "unknown" || originalPhenotype === "poor") continue;
+    if (!originalPhenotype || originalPhenotype === "unknown" || originalPhenotype === "poor") continue;
 
     // Strong inhibitor: shift down 2 levels (e.g., Normal → Poor)
     // Moderate inhibitor: shift down 1 level (e.g., Normal → Intermediate)

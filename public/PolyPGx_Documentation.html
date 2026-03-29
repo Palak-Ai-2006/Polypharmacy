@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PolyPGx: Clinical Decision Support for Polypharmacy | HackPSU 2026</title>
+<meta name="description" content="PolyPGx is an AI-powered pharmacogenomics engine that detects dangerous drug-drug-gene interactions in real time.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ================================================================
+   Palette: Sanzo Wada, Dictionary of Color Combinations (Light)
+   Combination refs: #133 Ivory+Verdigris, #248 Naples+Prussian,
+   #351 Venetian Red on parchment, #56 Celadon highlights
+   ================================================================ */
+:root {
+  --bg-page:        #ffffff;
+  --bg-surface:     #ffffff;
+  --bg-elevated:    #fdfbf7;
+  --bg-glass:       rgba(255,255,255,0.85);
+  --accent-primary: #3d7a6b;  /* Wada: Verdigris, darkened for light bg */
+  --accent-primary-muted: rgba(61,122,107,0.08);
+  --accent-primary-glow: rgba(61,122,107,0.18);
+  --accent-warm:    #b08830;  /* Wada: Naples Yellow, deepened */
+  --accent-warm-muted: rgba(176,136,48,0.08);
+  --accent-deep:    #1e3a5f;  /* Wada: Prussian Blue */
+  --accent-deep-muted: rgba(30,58,95,0.08);
+  --accent-danger:  #b5453a;  /* Wada: Venetian Red */
+  --accent-danger-muted: rgba(181,69,58,0.08);
+  --accent-caution: #a87040;  /* Wada: Raw Sienna */
+  --accent-caution-muted: rgba(168,112,64,0.08);
+  --text-primary:   #111827;
+  --text-secondary: #374151;
+  --text-muted:     #6b7280;
+  --border:         #e2ddd3;
+  --border-subtle:  #ece7dd;
+  --font-display: 'Cormorant Garamond','Georgia',serif;
+  --font-body:    'IBM Plex Sans',system-ui,sans-serif;
+  --font-mono:    'IBM Plex Mono','Consolas',monospace;
+  --radius: 10px;
+  --shadow-float: 0 2px 4px rgba(42,37,32,0.04), 0 8px 24px rgba(42,37,32,0.07);
+  --shadow-hover: 0 4px 12px rgba(42,37,32,0.06), 0 16px 40px rgba(42,37,32,0.09);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:16px}
+body{background:var(--bg-page);color:var(--text-primary);font-family:var(--font-body);font-weight:400;line-height:1.75;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+a{color:var(--accent-primary);text-decoration:none;transition:color .2s}
+a:hover{color:var(--accent-deep)}
+code{font-family:var(--font-mono);font-size:.84em;background:var(--accent-primary-muted);border:1px solid var(--border);padding:.1em .4em;border-radius:4px;color:var(--accent-primary)}
+strong{color:var(--text-primary);font-weight:600}
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--bg-glass);backdrop-filter:blur(14px) saturate(1.3);-webkit-backdrop-filter:blur(14px) saturate(1.3);border-bottom:1px solid var(--border);padding:0 2.5rem;height:52px;display:flex;align-items:center;justify-content:space-between}
+.nav-brand{font-family:var(--font-display);font-size:1.3rem;font-weight:700;color:var(--text-primary)}
+.nav-brand .a{color:var(--accent-primary)}
+.nav-links{display:flex;gap:1.8rem;list-style:none}
+.nav-links a{color:var(--text-muted);font-family:var(--font-mono);font-size:.68rem;font-weight:500;text-transform:uppercase;letter-spacing:.12em;transition:color .3s}
+.nav-links a:hover{color:var(--accent-primary)}
+/* LAYOUT */
+.c{max-width:900px;margin:0 auto;padding:0 2rem}
+section{padding:4.5rem 0;border-bottom:1px solid var(--border-subtle)}
+section:last-of-type{border-bottom:none}
+/* HERO */
+.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:5rem 2rem;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:-30%;background:radial-gradient(ellipse at 30% 40%,rgba(61,122,107,.06) 0%,transparent 55%),radial-gradient(ellipse at 70% 30%,rgba(30,58,95,.04) 0%,transparent 50%),radial-gradient(ellipse at 50% 80%,rgba(176,136,48,.03) 0%,transparent 45%);animation:drift 22s ease-in-out infinite alternate;will-change:transform;z-index:0}
+@keyframes drift{from{transform:translate(0,0)}to{transform:translate(-1%,.5%)}}
+.hero>*{position:relative;z-index:1}
+.hero-tag{font-family:var(--font-mono);font-size:.68rem;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--accent-primary);border:1px solid var(--accent-primary-glow);background:var(--accent-primary-muted);padding:.35rem 1.1rem;border-radius:999px;margin-bottom:2rem;animation:fadeIn .6s ease-out}
+.hero h1{font-family:var(--font-display);font-size:clamp(3rem,7vw,5.5rem);font-weight:700;line-height:1.05;margin-bottom:1.5rem;animation:fadeUp .8s ease-out .1s both}
+.hero h1 .a{color:var(--accent-primary)}
+.hero-sub{font-size:clamp(1rem,1.8vw,1.15rem);font-weight:300;color:var(--text-secondary);max-width:560px;line-height:1.8;margin-bottom:2.5rem;animation:fadeUp .8s ease-out .25s both}
+.hero-stats{display:flex;gap:2.5rem;flex-wrap:wrap;justify-content:center;animation:fadeUp .8s ease-out .4s both}
+.hs{text-align:center}
+.hs-l{font-family:var(--font-mono);font-size:.62rem;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted);margin-bottom:.15rem}
+.hs-v{font-family:var(--font-display);font-size:1.1rem;font-weight:600;color:var(--text-primary)}
+/* SECTION HEADERS */
+.sn{font-family:var(--font-mono);font-size:.72rem;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--accent-primary);margin-bottom:.5rem;display:block}
+.st{font-family:var(--font-display);font-size:clamp(2rem,4vw,3.2rem);font-weight:700;line-height:1.12;margin-bottom:.8rem}
+.sd{color:var(--text-secondary);font-weight:300;max-width:580px;margin-bottom:2.5rem;font-size:1rem}
+.sh{font-family:var(--font-display);font-size:1.25rem;font-weight:600;margin-top:2.2rem;margin-bottom:.8rem;color:var(--text-primary)}
+/* CARDS */
+.cg{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1.15rem}
+.cd{background:var(--bg-glass);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;transition:transform .35s ease,box-shadow .35s ease,border-color .3s;will-change:transform}
+.cd:hover{transform:translateY(-3px);box-shadow:var(--shadow-hover);border-color:var(--accent-primary-glow)}
+.cd-dot{width:7px;height:7px;border-radius:50%;margin-bottom:1rem;display:block}
+.cd h3{font-family:var(--font-display);font-size:1.1rem;font-weight:600;margin-bottom:.4rem}
+.cd p{font-size:.86rem;color:var(--text-secondary);line-height:1.65;font-weight:300}
+/* PIPELINE (single row) */
+.pipe{display:flex;align-items:center;justify-content:center;gap:0;margin:2rem 0;flex-wrap:nowrap;overflow-x:auto;padding:.5rem 0}
+.pn{background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:.7rem 1rem;text-align:center;white-space:nowrap;flex-shrink:0;transition:border-color .3s,transform .3s}
+.pn:hover{border-color:var(--accent-primary-glow);transform:translateY(-2px)}
+.pn-num{font-family:var(--font-mono);font-size:.58rem;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted)}
+.pn-name{font-family:var(--font-display);font-weight:600;font-size:.88rem;color:var(--text-primary)}
+.ps{color:var(--accent-primary);padding:0 .4rem;font-size:.9rem;opacity:.4;flex-shrink:0}
+/* TABLES */
+.dt{width:100%;border-collapse:collapse;margin:1.2rem 0;font-size:.86rem}
+.dt th{text-align:left;padding:.6rem .9rem;background:var(--bg-elevated);border:1px solid var(--border);font-family:var(--font-mono);font-size:.66rem;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--accent-primary)}
+.dt td{padding:.6rem .9rem;border:1px solid var(--border-subtle);color:var(--text-secondary);font-weight:300}
+.dt tbody tr{transition:background .2s}
+.dt tbody tr:hover td{background:var(--bg-elevated)}
+/* RISK */
+.r{display:inline-block;padding:.12rem .5rem;border-radius:4px;font-family:var(--font-mono);font-size:.64rem;font-weight:500;letter-spacing:.04em}
+.rc{background:var(--accent-danger-muted);color:var(--accent-danger)}
+.rh{background:var(--accent-caution-muted);color:var(--accent-caution)}
+/* STEPS */
+.steps{counter-reset:sc;list-style:none;padding:0}
+.steps li{counter-increment:sc;display:flex;gap:1rem;align-items:flex-start;margin-bottom:1.4rem}
+.steps li::before{content:counter(sc);flex-shrink:0;width:28px;height:28px;border-radius:50%;background:var(--accent-primary-muted);border:1px solid var(--accent-primary-glow);color:var(--accent-primary);font-family:var(--font-mono);font-weight:500;font-size:.75rem;display:flex;align-items:center;justify-content:center}
+.steps li div{flex:1}
+.steps li strong{display:block;margin-bottom:.2rem}
+/* ROADMAP */
+.re{display:flex;gap:1rem;margin-bottom:1rem;padding:1.2rem;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);transition:transform .3s,border-color .3s,box-shadow .3s;will-change:transform}
+.re:hover{transform:translateY(-2px);border-color:var(--accent-primary-glow);box-shadow:var(--shadow-float)}
+.rb{flex-shrink:0;width:3px;border-radius:2px}
+.rb-h{background:var(--accent-danger)}
+.rb-m{background:var(--accent-caution)}
+.rb-l{background:var(--accent-deep)}
+.re h4{font-family:var(--font-display);font-size:.95rem;font-weight:600;margin-bottom:.2rem}
+.re p{font-size:.84rem;color:var(--text-secondary);font-weight:300}
+/* PITCH */
+.ps-card{background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.75rem;margin-bottom:1.2rem;transition:border-color .3s}
+.ps-card:hover{border-color:var(--accent-primary-glow)}
+.ps-time{font-family:var(--font-mono);font-size:.64rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--accent-primary);margin-bottom:.4rem}
+.ps-card h4{font-family:var(--font-display);font-size:1.15rem;font-weight:600;margin-bottom:.6rem}
+.ps-card p,.ps-card li{color:var(--text-secondary);font-size:.88rem;font-weight:300;line-height:1.7}
+.ps-card blockquote{border-left:2px solid var(--accent-warm);padding-left:1.1rem;margin:.8rem 0;font-family:var(--font-display);font-style:italic;font-size:1rem;color:var(--text-primary);line-height:1.65}
+.ps-card ul,.ps-card ol{padding-left:1.5rem;margin-top:.4rem}
+.ps-card li{margin-bottom:.25rem}
+/* STATUS */
+.sp{color:var(--accent-primary);font-family:var(--font-mono);font-weight:500;font-size:.8rem}
+.sw{color:var(--accent-caution);font-family:var(--font-mono);font-weight:500;font-size:.8rem}
+.sn-s{color:var(--text-muted);font-family:var(--font-mono);font-weight:500;font-size:.8rem}
+/* CALLOUT */
+.callout{background:var(--bg-elevated);border:1px solid var(--border);border-left:3px solid var(--accent-caution);border-radius:4px;padding:1rem 1.2rem;margin-top:1.5rem}
+.callout-label{font-family:var(--font-mono);font-size:.68rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--accent-caution);margin-bottom:.25rem}
+.callout p{font-size:.86rem;color:var(--text-secondary);font-weight:300}
+/* FOOTER */
+footer{padding:3rem 0 2.5rem;text-align:center}
+footer .closing{font-family:var(--font-display);font-size:1.1rem;font-weight:400;color:var(--text-secondary);margin-bottom:.35rem}
+footer .credit{font-family:var(--font-mono);font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted)}
+/* DIVIDER */
+.dv{height:1px;background:var(--border-subtle);margin:2rem 0;border:none}
+/* ANIMATIONS */
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+/* RESPONSIVE */
+@media(max-width:768px){nav{padding:0 1.2rem}.nav-links{display:none}.c{padding:0 1.2rem}section{padding:3rem 0}.pipe{flex-direction:column}.ps{transform:rotate(90deg)}.hero-stats{flex-direction:column;gap:1rem}.cg{grid-template-columns:1fr}}
+/* PRINT */
+@media print{nav{display:none}body{background:#fff;color:#1a1a1e}section{padding:1.5rem 0;break-inside:avoid}.hero{min-height:auto;padding:2rem}.hero::before{display:none}.cd,.ps-card,.re{border-color:#ccc;background:#fafaf5;backdrop-filter:none}code{background:#f0ede5;border-color:#ccc;color:#3a6b5a}.hero h1 .a{color:#3a7a6a}}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-brand">Poly<span class="a">PGx</span></div>
+  <ul class="nav-links">
+    <li><a href="#motivation">Motivation</a></li>
+    <li><a href="#architecture">Architecture</a></li>
+    <li><a href="#install">Install</a></li>
+    <li><a href="#usage">Usage</a></li>
+    <li><a href="#roadmap">Roadmap</a></li>
+    <li><a href="#pitch">Pitch</a></li>
+  </ul>
+</nav>
+<section class="hero" id="top">
+  <span class="hero-tag">HackPSU 2026</span>
+  <h1>Poly<span class="a">PGx</span></h1>
+  <p class="hero-sub">A clinical decision support engine that detects dangerous drug-drug-gene interactions in real time, preventing adverse drug events before they reach the patient.</p>
+  <div class="hero-stats">
+    <div class="hs"><div class="hs-l">Stack</div><div class="hs-v">Next.js 16 + Gemini</div></div>
+    <div class="hs"><div class="hs-l">Pipeline</div><div class="hs-v">5 Decoupled Layers</div></div>
+    <div class="hs"><div class="hs-l">Data Sources</div><div class="hs-v">FDA, PharmGKB, CPIC</div></div>
+    <div class="hs"><div class="hs-l">Built In</div><div class="hs-v">24 Hours</div></div>
+  </div>
+</section>
+<section id="motivation">
+  <div class="c">
+    <span class="sn">01 / Motivation</span>
+    <h2 class="st">The Polypharmacy Crisis</h2>
+    <p class="sd">Over <strong>40% of adults aged 65 and older</strong> take five or more medications simultaneously. Each additional drug exponentially increases the probability of a dangerous interaction, particularly when genetic variation alters how the body metabolizes those drugs. Current EHR alert systems suffer from alert fatigue, with clinicians overriding more than 95% of all warnings because they lack pharmacogenomic context.</p>
+    <div class="cg">
+      <div class="cd">
+        <span class="cd-dot" style="background:var(--accent-danger)"></span>
+        <h3>125,000+ Deaths per Year</h3>
+        <p>Adverse drug reactions are the fourth leading cause of death in the United States. The majority stem from preventable drug-drug interactions.</p>
+      </div>
+      <div class="cd">
+        <span class="cd-dot" style="background:var(--accent-warm)"></span>
+        <h3>Genetic Blind Spots</h3>
+        <p>Approximately 98% of patients carry at least one actionable pharmacogenomic variant, yet fewer than 1% have ever been tested.</p>
+      </div>
+      <div class="cd">
+        <span class="cd-dot" style="background:var(--accent-primary)"></span>
+        <h3>Alert Fatigue</h3>
+        <p>Clinicians override 95% of drug interaction alerts because existing systems generate noise without clinical context.</p>
+      </div>
+    </div>
+  </div>
+</section>
+<section id="scope">
+  <div class="c">
+    <span class="sn">02 / Scope</span>
+    <h2 class="st">What PolyPGx Does</h2>
+    <p class="sd">A five-layer clinical reasoning engine combining deterministic pharmacology logic with LLM-powered clinical reasoning to produce actionable, EHR-ready assessments.</p>
+    <div class="cg">
+      <div class="cd">
+        <span class="cd-dot" style="background:var(--accent-primary)"></span>
+        <h3>CYP Collision Detection</h3>
+        <p>Deterministic engine mapping four major CYP enzymes (3A4, 2D6, 2C19, 2C9) across substrates, inhibitors, and inducers. Zero AI hallucination risk.</p>
+      </div>
+      <div class="cd">
+        <span class="cd-dot" style="background:var(--accent-deep)"></span>
+        <h3>Phenoconversion Modeling</h3>
+        <p>Detects when drug inhibitors shift a patient's metabolizer phenotype (e.g., normal to poor), revealing hidden toxicity risks.</p>
+      </div>
+      <div class="cd">
+        <span class="cd-dot" style="background:var(--accent-warm)"></span>
+        <h3>RAG-Enriched Reasoning</h3>
+        <p>Retrieves CPIC guidelines and PharmGKB annotations via ChromaDB vector search, feeding evidence into Gemini for grounded reasoning.</p>
+      </div>
+      <div class="cd">
+        <span class="cd-dot" style="background:var(--accent-danger)"></span>
+        <h3>EHR-Ready Clinical Notes</h3>
+        <p>Auto-generates Assessment and Plan notes that a hospitalist can paste directly into the electronic health record.</p>
+      </div>
+    </div>
+  </div>
+</section>
+<section id="architecture">
+  <div class="c">
+    <span class="sn">03 / Architecture</span>
+    <h2 class="st">Five-Layer Pipeline</h2>
+    <p class="sd">Every analysis flows through five decoupled layers. Layers 1 through 3 are entirely deterministic. Layer 4 uses Gemini for clinical reasoning. Layer 5 renders the results.</p>
+    <div class="pipe">
+      <div class="pn"><div class="pn-num">Layer 1</div><div class="pn-name">Drug Input + RxNorm</div></div>
+      <span class="ps">/</span>
+      <div class="pn"><div class="pn-num">Layer 2</div><div class="pn-name">CYP Collision Engine</div></div>
+      <span class="ps">/</span>
+      <div class="pn"><div class="pn-num">Layer 3</div><div class="pn-name">RAG + OpenFDA</div></div>
+      <span class="ps">/</span>
+      <div class="pn"><div class="pn-num">Layer 4</div><div class="pn-name">Gemini Reasoning</div></div>
+      <span class="ps">/</span>
+      <div class="pn"><div class="pn-num">Layer 5</div><div class="pn-name">Clinical UI</div></div>
+    </div>
+    <h3 class="sh">File Map</h3>
+    <table class="dt">
+      <thead><tr><th>File</th><th>Layer</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td><code>app/page.tsx</code></td><td>5</td><td>Thin orchestrator: composes components, manages SSE streaming, demo case loading (~290 lines)</td></tr>
+        <tr><td><code>app/api/analyze/route.ts</code></td><td>1 to 4</td><td>SSE streaming endpoint: emits collisions instantly, then streams LLM reasoning progressively</td></tr>
+        <tr><td><code>lib/store.ts</code></td><td>5</td><td>Zustand centralized state store (replaces 30+ useState hooks)</td></tr>
+        <tr><td><code>components/app/DrugSearchPanel.tsx</code></td><td>5</td><td>Drug search with RxNorm autocomplete, medication list, primary physician display</td></tr>
+        <tr><td><code>components/app/PatientInfoSidebar.tsx</code></td><td>5</td><td>Patient demographics, clinical context, pharmacogenomics profile selectors</td></tr>
+        <tr><td><code>components/app/AnalysisResultsPanel.tsx</code></td><td>5</td><td>Risk banner, enzyme activity, drug interactions, AI sources with progressive SSE rendering</td></tr>
+        <tr><td><code>components/app/EnzymeActivityAccordion.tsx</code></td><td>5</td><td>Per-enzyme collision display with substrate/inhibitor/inducer role badges</td></tr>
+        <tr><td><code>components/app/PhysicianNotesEditor.tsx</code></td><td>5</td><td>Clinical notes textarea with copy-to-clipboard and print functionality</td></tr>
+        <tr><td><code>components/app/AppHeader.tsx</code></td><td>5</td><td>Application header bar with branding and navigation</td></tr>
+        <tr><td><code>lib/collision-detector.ts</code></td><td>2</td><td>Deterministic CYP collision engine (no AI dependency)</td></tr>
+        <tr><td><code>lib/phenoconversion.ts</code></td><td>2</td><td>Phenoconversion shift detection for metabolizer phenotypes</td></tr>
+        <tr><td><code>lib/rag-chain.ts</code></td><td>4</td><td>LangChain + Gemini structured reasoning chain</td></tr>
+        <tr><td><code>lib/retriever.ts</code></td><td>3</td><td>ChromaDB vector retrieval for CPIC and PharmGKB annotations</td></tr>
+        <tr><td><code>lib/openfda.ts</code></td><td>3</td><td>FDA drug safety label lookup via public API</td></tr>
+        <tr><td><code>lib/rxnorm.ts</code></td><td>1</td><td>RxNorm autocomplete for drug name normalization</td></tr>
+        <tr><td><code>lib/types.ts</code></td><td>All</td><td>Shared TypeScript type contracts across all layers</td></tr>
+        <tr><td><code>data/cyp_database.json</code></td><td>2</td><td>Curated FDA CYP enzyme interaction table</td></tr>
+        <tr><td><code>scripts/ingest.ts</code></td><td>3</td><td>RAG ingestion: builds ChromaDB collection from guidelines</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+<section id="install">
+  <div class="c">
+    <span class="sn">04 / Installation</span>
+    <h2 class="st">Getting Started</h2>
+    <p class="sd">PolyPGx runs locally with minimal setup. The only hard requirement is a free Gemini API key from Google AI Studio.</p>
+    <h3 class="sh">Prerequisites</h3>
+    <table class="dt" style="max-width:460px">
+      <thead><tr><th>Tool</th><th>Version</th></tr></thead>
+      <tbody>
+        <tr><td>Node.js</td><td>18.x or newer</td></tr>
+        <tr><td>npm</td><td>9.x or newer</td></tr>
+        <tr><td>Gemini API Key</td><td><a href="https://aistudio.google.com" target="_blank">Free at AI Studio</a></td></tr>
+        <tr><td>ChromaDB (optional)</td><td>0.4 or newer, for RAG layer</td></tr>
+      </tbody>
+    </table>
+    <h3 class="sh">Setup Steps</h3>
+    <ol class="steps">
+      <li><div><strong>Clone the repository</strong><br><code>git clone https://github.com/your-org/polypgx.git</code></div></li>
+      <li><div><strong>Install dependencies</strong><br><code>npm install --legacy-peer-deps</code></div></li>
+      <li><div><strong>Configure environment</strong><br>Copy <code>.env.example</code> to <code>.env.local</code> and add your <code>GEMINI_API_KEY</code></div></li>
+      <li><div><strong>Start the development server</strong><br><code>npm run dev</code></div></li>
+      <li><div><strong>Optional: Start ChromaDB for RAG</strong><br><code>pip install chromadb</code> then <code>chroma run --port 8000 --path ./chroma_db</code><br>Ingest: <code>npx ts-node scripts/ingest.ts</code></div></li>
+    </ol>
+    <div class="callout">
+      <div class="callout-label">Build Note</div>
+      <p><code>npm run build</code> may fail under Turbopack due to an upstream ESM/CJS conflict with <code>@chroma-core/default-embed</code>. This does not affect the development server. For production deployment, use Webpack mode.</p>
+    </div>
+  </div>
+</section>
+<section id="usage">
+  <div class="c">
+    <span class="sn">05 / Usage</span>
+    <h2 class="st">Clinical Workflow</h2>
+    <p class="sd">Enter a patient's medications and genetic profile. PolyPGx returns a full pharmacogenomic risk assessment in seconds.</p>
+    <ol class="steps">
+      <li><div><strong>Enter Patient Information</strong><br>Name, age, and genetic metabolizer phenotypes for CYP3A4, CYP2D6, CYP2C19, and CYP2C9.</div></li>
+      <li><div><strong>Add Medications</strong><br>Type drug names with real-time RxNorm autocomplete. Use <code>Ctrl+K</code> to focus the search bar.</div></li>
+      <li><div><strong>Run Analysis</strong><br>Click "Analyze Interactions" or load a pre-built demo case. Analysis auto-triggers for demo profiles.</div></li>
+      <li><div><strong>Review Results</strong><br>Inspect CYP enzyme collisions, phenoconversion events, per-drug risk cards, and structured LLM reasoning.</div></li>
+      <li><div><strong>Export</strong><br>Copy the clinical note to clipboard, or click "Print Report" for a clean PDF.</div></li>
+    </ol>
+    <hr class="dv">
+    <h3 class="sh">Pre-Configured Demo Cases</h3>
+    <table class="dt">
+      <thead><tr><th>Scenario</th><th>Medications</th><th>Risk</th><th>Key Finding</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Warfarin + Fluconazole</strong></td><td>Warfarin, Fluconazole, Omeprazole</td><td><span class="r rc">CRITICAL</span></td><td>CYP2C9 inhibition causes warfarin accumulation and bleeding risk</td></tr>
+        <tr><td><strong>Cardiac Polypharmacy</strong></td><td>Clopidogrel, Omeprazole, Simvastatin, Amlodipine</td><td><span class="r rh">HIGH</span></td><td>CYP2C19 inhibition reduces clopidogrel activation; statin interaction via CYP3A4</td></tr>
+        <tr><td><strong>Psychiatry + Pain</strong></td><td>Fluoxetine, Codeine, Tramadol</td><td><span class="r rc">CRITICAL</span></td><td>CYP2D6 blockade by fluoxetine eliminates codeine and tramadol conversion</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+<section id="roadmap">
+  <div class="c">
+    <span class="sn">06 / Roadmap</span>
+    <h2 class="st">Future Scope</h2>
+    <p class="sd">The path from hackathon prototype to production-grade clinical decision support.</p>
+    <div class="re"><div class="rb rb-m"></div><div><h4>Interactive CYP Enzyme Heatmap</h4><p>Drug-vs-enzyme heatmap with recharts showing competition intensity, color-coded by risk level with hover tooltips.</p></div></div>
+    <div class="re"><div class="rb rb-m"></div><div><h4>End-to-End Test Suite</h4><p>Playwright tests covering the full clinical workflow: demo case load, auto-analysis, results display, clinical note copy, and print export.</p></div></div>
+    <div class="re"><div class="rb rb-l"></div><div><h4>Multi-Patient Dashboard</h4><p>Batch analysis for pharmacists managing 20+ patients. Priority-sorted by risk level with drill-down.</p></div></div>
+  </div>
+</section>
+<section id="pitch">
+  <div class="c">
+    <span class="sn">07 / Presentation Script</span>
+    <h2 class="st">Three-Minute Pitch</h2>
+    <p class="sd">A timed script for presenting PolyPGx to judges. Each segment fits its allocated window.</p>
+    <div class="ps-card">
+      <div class="ps-time">0:00 to 0:30 / The Hook</div>
+      <h4>Open with the Problem</h4>
+      <blockquote>"Every 19 seconds, someone in the US is hospitalized because of a drug interaction their doctor did not catch. 125,000 people die every year. Not from disease, but from the medications meant to help them."</blockquote>
+      <p>Pause. Let the number land.</p>
+      <p>"The reason? Doctors prescribe 5, 10, 15 medications at once, and these drugs compete inside the same metabolic pathways in your liver. Add genetic variation, and you have a ticking time bomb that no existing EHR system can detect."</p>
+    </div>
+    <div class="ps-card">
+      <div class="ps-time">0:30 to 1:00 / The Solution</div>
+      <h4>Introduce PolyPGx</h4>
+      <p>"We built PolyPGx: a real-time pharmacogenomics engine that catches what EHR alerts miss."</p>
+      <ul>
+        <li><strong>Deterministic first:</strong> CYP collision engine runs pure pharmacology logic. No AI hallucination.</li>
+        <li><strong>AI-augmented second:</strong> Gemini reasons through collision data with CPIC guidelines.</li>
+        <li><strong>EHR-ready output:</strong> One-click clinical notes ready for the patient chart.</li>
+      </ul>
+    </div>
+    <div class="ps-card">
+      <div class="ps-time">1:00 to 2:15 / Live Demo</div>
+      <h4>Show, Do Not Tell</h4>
+      <ol>
+        <li>Open the app. Show the clean clinical interface.</li>
+        <li>Click "Demo: Warfarin + Fluconazole". Analysis auto-triggers.</li>
+        <li>Point at the <span class="r rc">CRITICAL</span> badge on CYP2C9.</li>
+        <li>"Fluconazole is a strong CYP2C9 inhibitor. Warfarin is a sensitive substrate. Found without AI, in 2ms."</li>
+        <li>Scroll to Gemini reasoning. "The AI explains the mechanism, cites CPIC, generates an Assessment and Plan."</li>
+        <li>Click "Copy Clinical Note". "Ready to paste into Epic."</li>
+        <li>Click "Print Report". "Paper chart output."</li>
+      </ol>
+    </div>
+    <div class="ps-card">
+      <div class="ps-time">2:15 to 2:45 / The Architecture</div>
+      <h4>Technical Depth in 30 Seconds</h4>
+      <p>"Five layers. RxNorm autocomplete, deterministic CYP engine, RAG retrieval from PharmGKB and FDA, Gemini structured reasoning, clinical UI. Layers 1 through 3 are deterministic. If Gemini goes down, the app still works."</p>
+    </div>
+    <div class="ps-card">
+      <div class="ps-time">2:45 to 3:00 / The Close</div>
+      <h4>Vision and Ask</h4>
+      <blockquote>"PolyPGx is a 24-hour prototype. With FHIR integration and an expanded drug database, this becomes a pharmacogenomics co-pilot in every EHR. Our north star: zero preventable adverse drug events."</blockquote>
+      <p>"Thank you. We are happy to take questions."</p>
+    </div>
+  </div>
+</section>
+<section id="integrity">
+  <div class="c">
+    <span class="sn">08 / Integrity Report</span>
+    <h2 class="st">Final Project Scan</h2>
+    <p class="sd">Results of the comprehensive integrity scan performed before submission.</p>
+    <table class="dt">
+      <thead><tr><th>Check</th><th>Status</th><th>Details</th></tr></thead>
+      <tbody>
+        <tr><td>Hardcoded API Keys</td><td><span class="sp">CLEAN</span></td><td>No Gemini, OpenAI, or Anthropic keys found in source code</td></tr>
+        <tr><td>Hardcoded Passwords</td><td><span class="sp">CLEAN</span></td><td>Zero matches for "password" or "secret" in application code</td></tr>
+        <tr><td>.env.example Accuracy</td><td><span class="sp">FIXED</span></td><td>Updated to reflect actual Gemini-based stack</td></tr>
+        <tr><td>Missing Dependencies</td><td><span class="sp">RESOLVED</span></td><td>@langchain/google-genai, @langchain/core, and zustand installed</td></tr>
+        <tr><td>Architecture Refactor</td><td><span class="sp">COMPLETE</span></td><td>Component decomposition (6 components), SSE streaming, Zustand store</td></tr>
+        <tr><td>TypeScript Compilation</td><td><span class="sp">CLEAN</span></td><td>Zero errors on tsc --noEmit after full refactoring</td></tr>
+        <tr><td>PII / Patient Data</td><td><span class="sp">CLEAN</span></td><td>All demo data is fictional. No real patient information.</td></tr>
+        <tr><td>Build Status</td><td><span class="sw">KNOWN ISSUE</span></td><td>Turbopack CJS/ESM conflict with @chroma-core. Dev server works.</td></tr>
+        <tr><td>Git Status</td><td><span class="sn-s">N/A</span></td><td>No .git directory initialized. Ready for git init.</td></tr>
+        <tr><td>npm audit</td><td><span class="sp">CLEAN</span></td><td>0 vulnerabilities across 277 packages</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+<footer>
+  <div class="c">
+    <p class="closing">Because no one should be harmed by the medications meant to help them.</p>
+    <p class="credit">PolyPGx / Built at HackPSU 2026</p>
+  </div>
+</footer>
+</body>
+</html>

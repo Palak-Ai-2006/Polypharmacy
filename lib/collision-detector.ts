@@ -15,7 +15,7 @@ import type {
   RiskLevel,
 } from "./types";
 
-const ENZYMES: CYPEnzyme[] = ["CYP3A4", "CYP2D6", "CYP2C19", "CYP2C9"];
+const ENZYMES: CYPEnzyme[] = ["CYP3A4", "CYP2D6", "CYP2C19", "CYP2C9", "CYP1A2", "CYP2B6", "CYP2E1", "CYP3A5"];
 const db = cypDatabase as CYPDatabase;
 
 /**
@@ -32,6 +32,10 @@ export function detectCollisions(patient: PatientInput): CollisionMap {
     CYP2D6: { substrates: [], inhibitors: [], inducers: [] },
     CYP2C19: { substrates: [], inhibitors: [], inducers: [] },
     CYP2C9: { substrates: [], inhibitors: [], inducers: [] },
+    CYP1A2: { substrates: [], inhibitors: [], inducers: [] },
+    CYP2B6: { substrates: [], inhibitors: [], inducers: [] },
+    CYP2E1: { substrates: [], inhibitors: [], inducers: [] },
+    CYP3A5: { substrates: [], inhibitors: [], inducers: [] },
   };
 
   for (const drugName of patient.drugs) {

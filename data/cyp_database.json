@@ -537,5 +537,249 @@
       }
     ],
     "clinical_note": "Carbamazepine is a potent CYP3A4 inducer that also induces its own metabolism (autoinduction), reducing its own plasma levels over the first several weeks of therapy while substantially lowering levels of many co-administered drugs."
+  },
+  "theophylline": {
+    "enzymes": [
+      { "enzyme": "CYP1A2", "role": "substrate", "strength": "sensitive" }
+    ],
+    "clinical_note": "Theophylline has a narrow therapeutic index and is almost exclusively metabolized by CYP1A2. CYP1A2 inhibitors can cause life-threatening toxicity."
+  },
+  "caffeine": {
+    "enzymes": [
+      { "enzyme": "CYP1A2", "role": "substrate", "strength": "sensitive" }
+    ],
+    "clinical_note": "Caffeine is the classic CYP1A2 probe substrate. Changes in caffeine metabolism reliably indicate CYP1A2 activity."
+  },
+  "fluvoxamine": {
+    "enzymes": [
+      { "enzyme": "CYP1A2", "role": "inhibitor", "strength": "strong" },
+      { "enzyme": "CYP2C19", "role": "inhibitor", "strength": "strong" },
+      { "enzyme": "CYP2D6", "role": "substrate", "strength": "moderate" }
+    ],
+    "clinical_note": "Fluvoxamine is the most potent CYP1A2 inhibitor in clinical use. Contraindicated with tizanidine and theophylline due to dangerous accumulation."
+  },
+  "ciprofloxacin": {
+    "enzymes": [
+      { "enzyme": "CYP1A2", "role": "inhibitor", "strength": "strong" }
+    ],
+    "clinical_note": "Ciprofloxacin strongly inhibits CYP1A2 and can dramatically increase theophylline and tizanidine exposure."
+  },
+  "tizanidine": {
+    "enzymes": [
+      { "enzyme": "CYP1A2", "role": "substrate", "strength": "sensitive" }
+    ],
+    "clinical_note": "Tizanidine is a sensitive CYP1A2 substrate. Concomitant use with fluvoxamine or ciprofloxacin is contraindicated due to extreme hypotension risk."
+  },
+  "clozapine": {
+    "enzymes": [
+      { "enzyme": "CYP1A2", "role": "substrate", "strength": "sensitive" },
+      { "enzyme": "CYP2D6", "role": "substrate", "strength": "moderate" },
+      { "enzyme": "CYP3A4", "role": "substrate", "strength": "weak" }
+    ],
+    "clinical_note": "Clozapine is primarily metabolized by CYP1A2. Smoking induces CYP1A2, so smoking cessation can cause dangerous clozapine accumulation."
+  },
+  "olanzapine": {
+    "enzymes": [
+      { "enzyme": "CYP1A2", "role": "substrate", "strength": "sensitive" },
+      { "enzyme": "CYP2D6", "role": "substrate", "strength": "moderate" }
+    ],
+    "clinical_note": "Olanzapine is a sensitive CYP1A2 substrate. Dose adjustments are needed when combined with CYP1A2 inhibitors or in patients who stop smoking."
+  },
+  "bupropion": {
+    "enzymes": [
+      { "enzyme": "CYP2B6", "role": "substrate", "strength": "sensitive" },
+      { "enzyme": "CYP2B6", "role": "inhibitor", "strength": "strong" },
+      { "enzyme": "CYP2D6", "role": "inhibitor", "strength": "strong" }
+    ],
+    "clinical_note": "Bupropion is both a sensitive CYP2B6 substrate and a strong CYP2B6/CYP2D6 inhibitor. CYP2B6 poor metabolizers have significantly increased exposure and seizure risk."
+  },
+  "efavirenz": {
+    "enzymes": [
+      { "enzyme": "CYP2B6", "role": "substrate", "strength": "sensitive" },
+      { "enzyme": "CYP3A4", "role": "substrate", "strength": "moderate" }
+    ],
+    "clinical_note": "Efavirenz is a sensitive CYP2B6 substrate. CYP2B6 slow metabolizers have 2-3x higher plasma levels, increasing CNS side effects."
+  },
+  "methadone": {
+    "enzymes": [
+      { "enzyme": "CYP2B6", "role": "substrate", "strength": "sensitive" },
+      { "enzyme": "CYP3A4", "role": "substrate", "strength": "moderate" },
+      { "enzyme": "CYP2D6", "role": "substrate", "strength": "moderate" }
+    ],
+    "clinical_note": "Methadone is metabolized by multiple CYP enzymes with CYP2B6 as the primary pathway. CYP2B6 poor metabolizers have higher QTc prolongation risk."
+  },
+  "cyclophosphamide": {
+    "enzymes": [
+      { "enzyme": "CYP2B6", "role": "substrate", "strength": "sensitive" },
+      { "enzyme": "CYP3A4", "role": "substrate", "strength": "moderate" }
+    ],
+    "clinical_note": "Cyclophosphamide is a prodrug requiring CYP2B6 and CYP3A4 for bioactivation. Inhibitors of these enzymes reduce anti-tumor efficacy."
+  },
+  "ketamine": {
+    "enzymes": [
+      { "enzyme": "CYP2B6", "role": "substrate", "strength": "moderate" },
+      { "enzyme": "CYP3A4", "role": "substrate", "strength": "moderate" }
+    ],
+    "clinical_note": "Ketamine is primarily N-demethylated by CYP2B6 and CYP3A4 to norketamine. CYP2B6 polymorphisms affect analgesic response."
+  },
+  "isoniazid": {
+    "enzymes": [
+      { "enzyme": "CYP2E1", "role": "inhibitor", "strength": "moderate" },
+      { "enzyme": "CYP2C19", "role": "inhibitor", "strength": "moderate" }
+    ],
+    "clinical_note": "Isoniazid inhibits CYP2E1 and potentiates hepatotoxicity of acetaminophen by shunting its metabolism toward toxic pathways."
+  },
+  "acetaminophen": {
+    "enzymes": [
+      { "enzyme": "CYP2E1", "role": "substrate", "strength": "sensitive" },
+      { "enzyme": "CYP1A2", "role": "substrate", "strength": "moderate" },
+      { "enzyme": "CYP3A4", "role": "substrate", "strength": "weak" }
+    ],
+    "clinical_note": "At therapeutic doses, acetaminophen is safe. CYP2E1 produces the toxic metabolite NAPQI; chronic alcohol use induces CYP2E1, increasing hepatotoxicity risk."
+  },
+  "chlorzoxazone": {
+    "enzymes": [
+      { "enzyme": "CYP2E1", "role": "substrate", "strength": "sensitive" }
+    ],
+    "clinical_note": "Chlorzoxazone is the standard CYP2E1 probe substrate. Its 6-hydroxylation ratio is used to assess CYP2E1 activity in clinical studies."
+  },
+  "disulfiram": {
+    "enzymes": [
+      { "enzyme": "CYP2E1", "role": "inhibitor", "strength": "strong" }
+    ],
+    "clinical_note": "Disulfiram is a potent CYP2E1 inhibitor. It blocks both alcohol metabolism and CYP2E1-mediated drug metabolism."
+  },
+  "tacrolimus": {
+    "enzymes": [
+      { "enzyme": "CYP3A5", "role": "substrate", "strength": "sensitive" },
+      { "enzyme": "CYP3A4", "role": "substrate", "strength": "sensitive" }
+    ],
+    "clinical_note": "Tacrolimus is a narrow-therapeutic-index drug metabolized by both CYP3A4 and CYP3A5. CYP3A5 expressers (CYP3A5*1 carriers) require 1.5-2x higher doses."
+  },
+  "midazolam": {
+    "enzymes": [
+      { "enzyme": "CYP3A4", "role": "substrate", "strength": "sensitive" },
+      { "enzyme": "CYP3A5", "role": "substrate", "strength": "moderate" }
+    ],
+    "clinical_note": "Midazolam is the gold-standard CYP3A probe substrate. Strong CYP3A4 inhibitors can increase midazolam AUC by 5-10 fold."
+  },
+  "cyclosporine": {
+    "enzymes": [
+      { "enzyme": "CYP3A4", "role": "substrate", "strength": "sensitive" },
+      { "enzyme": "CYP3A5", "role": "substrate", "strength": "moderate" }
+    ],
+    "clinical_note": "Cyclosporine is a narrow-therapeutic-index immunosuppressant metabolized by CYP3A4/5. CYP3A5 expressers have lower trough levels requiring dose adjustment."
+  },
+  "sirolimus": {
+    "enzymes": [
+      { "enzyme": "CYP3A4", "role": "substrate", "strength": "sensitive" },
+      { "enzyme": "CYP3A5", "role": "substrate", "strength": "moderate" }
+    ],
+    "clinical_note": "Sirolimus, like tacrolimus, is a CYP3A4/5 substrate with narrow therapeutic index. Strong CYP3A4 inhibitors are contraindicated."
+  },
+  "duloxetine": {
+    "enzymes": [
+      { "enzyme": "CYP1A2", "role": "substrate", "strength": "sensitive" },
+      { "enzyme": "CYP2D6", "role": "inhibitor", "strength": "moderate" }
+    ],
+    "clinical_note": "Duloxetine is a sensitive CYP1A2 substrate and a moderate CYP2D6 inhibitor. Concomitant use with fluvoxamine or ciprofloxacin dramatically increases duloxetine levels."
+  },
+  "mirtazapine": {
+    "enzymes": [
+      { "enzyme": "CYP1A2", "role": "substrate", "strength": "moderate" },
+      { "enzyme": "CYP2D6", "role": "substrate", "strength": "moderate" },
+      { "enzyme": "CYP3A4", "role": "substrate", "strength": "moderate" }
+    ],
+    "clinical_note": "Mirtazapine is metabolized by multiple CYP enzymes. CYP1A2 inhibitors and CYP3A4 inhibitors both increase mirtazapine exposure."
+  },
+  "voriconazole": {
+    "enzymes": [
+      { "enzyme": "CYP2C19", "role": "inhibitor", "strength": "strong" },
+      { "enzyme": "CYP2C9", "role": "inhibitor", "strength": "strong" },
+      { "enzyme": "CYP3A4", "role": "inhibitor", "strength": "moderate" },
+      { "enzyme": "CYP2C19", "role": "substrate", "strength": "sensitive" },
+      { "enzyme": "CYP2C9", "role": "substrate", "strength": "moderate" },
+      { "enzyme": "CYP3A4", "role": "substrate", "strength": "moderate" }
+    ],
+    "clinical_note": "Potent multi-enzyme inhibitor (CYP2C19, CYP2C9, CYP3A4) — similar to fluconazole but broader-spectrum antifungal. Significantly increases warfarin, phenytoin, and tacrolimus levels. Contraindicated with rifampin."
+  },
+  "amiodarone": {
+    "enzymes": [
+      { "enzyme": "CYP2D6", "role": "inhibitor", "strength": "strong" },
+      { "enzyme": "CYP2C9", "role": "inhibitor", "strength": "moderate" },
+      { "enzyme": "CYP3A4", "role": "substrate", "strength": "moderate" }
+    ],
+    "clinical_note": "Amiodarone is a potent CYP2D6 inhibitor and moderate CYP2C9 inhibitor with an extremely long half-life (40-55 days). Drug interactions can persist for weeks to months after stopping."
+  },
+  "ketoconazole": {
+    "enzymes": [
+      { "enzyme": "CYP3A4", "role": "inhibitor", "strength": "strong" },
+      { "enzyme": "CYP2C9", "role": "inhibitor", "strength": "moderate" },
+      { "enzyme": "CYP3A4", "role": "substrate", "strength": "sensitive" }
+    ],
+    "clinical_note": "Ketoconazole is the classic potent CYP3A4 inhibitor — the gold standard positive control in drug interaction studies. Dramatically increases exposure to statins, midazolam, and many immunosuppressants."
+  },
+  "itraconazole": {
+    "enzymes": [
+      { "enzyme": "CYP3A4", "role": "inhibitor", "strength": "strong" },
+      { "enzyme": "CYP3A4", "role": "substrate", "strength": "sensitive" }
+    ],
+    "clinical_note": "Itraconazole is a potent CYP3A4 inhibitor. Can increase simvastatin AUC >10-fold; coadministration with simvastatin is contraindicated. Also significantly raises tacrolimus and cyclosporine levels."
+  },
+  "erythromycin": {
+    "enzymes": [
+      { "enzyme": "CYP3A4", "role": "inhibitor", "strength": "moderate" },
+      { "enzyme": "CYP3A4", "role": "substrate", "strength": "sensitive" }
+    ],
+    "clinical_note": "Erythromycin is a moderate CYP3A4 inhibitor and substrate. Can cause QT prolongation when combined with other QT-prolonging CYP3A4 substrates. Less potent than azole antifungals."
+  },
+  "hydrocodone": {
+    "enzymes": [
+      { "enzyme": "CYP2D6", "role": "substrate", "strength": "sensitive" },
+      { "enzyme": "CYP3A4", "role": "substrate", "strength": "moderate" }
+    ],
+    "clinical_note": "Hydrocodone is partially converted to hydromorphone (active) by CYP2D6. CYP2D6 poor metabolizers have reduced analgesic response; CYP2D6 inhibitors reduce efficacy."
+  },
+  "fentanyl": {
+    "enzymes": [
+      { "enzyme": "CYP3A4", "role": "substrate", "strength": "sensitive" }
+    ],
+    "clinical_note": "Fentanyl is a sensitive CYP3A4 substrate. Strong CYP3A4 inhibitors (e.g., itraconazole, ritonavir) can double fentanyl exposure, increasing risk of fatal respiratory depression."
+  },
+  "verapamil": {
+    "enzymes": [
+      { "enzyme": "CYP3A4", "role": "inhibitor", "strength": "moderate" },
+      { "enzyme": "CYP3A4", "role": "substrate", "strength": "sensitive" },
+      { "enzyme": "CYP2C8", "role": "substrate", "strength": "moderate" }
+    ],
+    "clinical_note": "Verapamil is both a moderate CYP3A4 inhibitor and sensitive substrate. Increases levels of simvastatin and cyclosporine. Combined with diltiazem can cause severe bradycardia."
+  },
+  "ritonavir": {
+    "enzymes": [
+      { "enzyme": "CYP3A4", "role": "inhibitor", "strength": "strong" },
+      { "enzyme": "CYP2D6", "role": "inhibitor", "strength": "moderate" },
+      { "enzyme": "CYP3A4", "role": "substrate", "strength": "sensitive" }
+    ],
+    "clinical_note": "Ritonavir is the most potent clinical CYP3A4 inhibitor — used as a 'pharmacokinetic booster' in HIV (Paxlovid) and HCV therapy. Simvastatin is contraindicated. Can cause life-threatening interactions with many drugs."
+  },
+  "grapefruit juice": {
+    "enzymes": [
+      { "enzyme": "CYP3A4", "role": "inhibitor", "strength": "strong" }
+    ],
+    "clinical_note": "Grapefruit juice contains furanocoumarins that irreversibly inhibit intestinal CYP3A4. A single glass can significantly increase levels of statins, calcium channel blockers, and immunosuppressants for up to 24 hours."
+  },
+  "st. john's wort": {
+    "enzymes": [
+      { "enzyme": "CYP3A4", "role": "inducer", "strength": "strong" },
+      { "enzyme": "CYP2C9", "role": "inducer", "strength": "moderate" },
+      { "enzyme": "CYP2C19", "role": "inducer", "strength": "moderate" }
+    ],
+    "clinical_note": "St. John's Wort is the most clinically significant herbal inducer. Dramatically reduces levels of warfarin, cyclosporine, HIV antiretrovirals, and oral contraceptives. Often overlooked in medication reconciliation."
+  },
+  "morphine": {
+    "enzymes": [
+      { "enzyme": "CYP2D6", "role": "substrate", "strength": "weak" }
+    ],
+    "clinical_note": "Morphine is primarily glucuronidated (UGT2B7), not CYP-metabolized. CYP interactions are minimal. Main concern is additive CNS/respiratory depression with other opioids and sedatives."
   }
 }

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PolyPGx — Future Scope</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',system-ui,sans-serif;background:#FDFBF7;color:#12354E;line-height:1.6;padding:2rem}
+  .container{max-width:860px;margin:0 auto}
+  h1{font-size:1.75rem;font-weight:700;margin-bottom:.25rem}
+  .subtitle{color:#5A6B7A;font-size:.85rem;margin-bottom:2rem}
+  h2{font-size:1.1rem;font-weight:600;color:#064F6E;margin:2rem 0 .75rem;padding-bottom:.4rem;border-bottom:2px solid #E8E4DC}
+  .scope-item{background:#fff;border:1px solid #E8E4DC;border-radius:8px;padding:1rem 1.25rem;margin-bottom:.75rem;transition:box-shadow .15s}
+  .scope-item:hover{box-shadow:0 2px 8px rgba(6,79,110,.08)}
+  .scope-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.35rem}
+  .scope-title{font-weight:600;font-size:.9rem}
+  .priority{font-size:.65rem;font-weight:600;padding:2px 10px;border-radius:12px}
+  .priority-high{background:#FDECEA;color:#C0392B}
+  .priority-medium{background:#FFF8E1;color:#E67E22}
+  .priority-low{background:#E8F5E9;color:#27AE60}
+  .scope-desc{font-size:.8rem;color:#5A6B7A;margin-top:.2rem}
+  .scope-impact{font-size:.7rem;color:#064F6E;margin-top:.4rem;font-style:italic}
+  .category{display:inline-block;font-size:.6rem;font-weight:600;color:#fff;background:#064F6E;padding:1px 8px;border-radius:4px;margin-right:.35rem}
+  .footer{text-align:center;margin-top:3rem;padding-top:1rem;border-top:1px solid #E8E4DC;font-size:.7rem;color:#5A6B7A}
+  .metric-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;margin:1.5rem 0}
+  .metric{background:#fff;border:1px solid #E8E4DC;border-radius:8px;padding:1rem;text-align:center}
+  .metric-value{font-size:1.5rem;font-weight:700;color:#064F6E}
+  .metric-label{font-size:.7rem;color:#5A6B7A;margin-top:.2rem}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>PolyPGx Future Scope</h1>
+  <p class="subtitle">Roadmap for continued development beyond HackPSU 2026</p>
+
+  <div class="metric-grid">
+    <div class="metric"><div class="metric-value">0</div><div class="metric-label">High Priority</div></div>
+    <div class="metric"><div class="metric-value">4</div><div class="metric-label">Medium Priority</div></div>
+    <div class="metric"><div class="metric-value">3</div><div class="metric-label">Low Priority</div></div>
+    <div class="metric"><div class="metric-value">5</div><div class="metric-label">Categories</div></div>
+  </div>
+
+  <h2>Clinical Features</h2>
+
+  <div class="scope-item">
+    <div class="scope-header">
+      <span class="scope-title">Multi-Patient Session Management</span>
+      <span class="priority priority-medium">Medium Priority</span>
+    </div>
+    <span class="category">Clinical</span>
+    <div class="scope-desc">Add a patient list sidebar with quick-switch between active patients. Persist state to localStorage or a database for multi-session use.</div>
+    <div class="scope-impact">Impact: Transforms from single-use demo tool to daily clinical workflow tool.</div>
+  </div>
+
+
+
+  <h2>Data Visualization</h2>
+
+  <div class="scope-item">
+    <div class="scope-header">
+      <span class="scope-title">Interactive CYP Enzyme Heatmap</span>
+      <span class="priority priority-medium">Medium Priority</span>
+    </div>
+    <span class="category">Visualization</span>
+    <div class="scope-desc">Use recharts (already installed) to create a drug-vs-enzyme heatmap showing competition intensity. Color-coded by risk level with hover tooltips.</div>
+    <div class="scope-impact">Impact: Judges and clinicians immediately grasp polypharmacy complexity at a glance.</div>
+  </div>
+
+  <div class="scope-item">
+    <div class="scope-header">
+      <span class="scope-title">Phenoconversion Timeline Visualization</span>
+      <span class="priority priority-low">Low Priority</span>
+    </div>
+    <span class="category">Visualization</span>
+    <div class="scope-desc">Show how metabolizer status changes over time as inhibitors/inducers are added or removed. Animate transitions for educational clarity.</div>
+    <div class="scope-impact">Impact: Unique differentiator — no existing tool visualizes phenoconversion dynamically.</div>
+  </div>
+
+  <h2>Testing &amp; Quality</h2>
+
+  <div class="scope-item">
+    <div class="scope-header">
+      <span class="scope-title">End-to-End Test Suite</span>
+      <span class="priority priority-medium">Medium Priority</span>
+    </div>
+    <span class="category">Quality</span>
+    <div class="scope-desc">Playwright tests covering: demo case load, auto-analysis, results display, clinical note copy, and print export flow.</div>
+    <div class="scope-impact">Impact: Prevents regressions in the critical demo flow.</div>
+  </div>
+
+
+
+  <h2>Security &amp; Compliance</h2>
+
+  <div class="scope-item">
+    <div class="scope-header">
+      <span class="scope-title">Input Sanitization &amp; Rate Limiting</span>
+      <span class="priority priority-medium">Medium Priority</span>
+    </div>
+    <span class="category">Security</span>
+    <div class="scope-desc">Add Zod validation on all API inputs. Implement rate limiting on /api/analyze to prevent API abuse and Gemini quota exhaustion.</div>
+    <div class="scope-impact">Impact: Production readiness. Prevents injection attacks and cost overruns.</div>
+  </div>
+
+  <div class="scope-item">
+    <div class="scope-header">
+      <span class="scope-title">HIPAA Compliance Layer</span>
+      <span class="priority priority-low">Low Priority</span>
+    </div>
+    <span class="category">Compliance</span>
+    <div class="scope-desc">Audit data flow for PHI leaks. Add encryption at rest, access logging, and session management. BAA with Gemini API provider.</div>
+    <div class="scope-impact">Impact: Mandatory for deployment in clinical settings.</div>
+  </div>
+
+  <h2>Developer Experience</h2>
+
+  <div class="scope-item">
+    <div class="scope-header">
+      <span class="scope-title">ChromaDB Docker Compose</span>
+      <span class="priority priority-low">Low Priority</span>
+    </div>
+    <span class="category">DevOps</span>
+    <div class="scope-desc">Add docker-compose.yml for local ChromaDB instance. Currently, RAG retriever fails gracefully but limits the demo to Gemini-only analysis.</div>
+    <div class="scope-impact">Impact: Enables RAG-augmented analysis with PharmGKB context for richer, more cited results.</div>
+  </div>
+
+  <div class="footer">
+    PolyPGx &middot; HackPSU 2026 &middot; 7 features across 5 categories
+  </div>
+</div>
+</body>
+</html>

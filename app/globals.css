@@ -168,3 +168,23 @@
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
+/* Print-friendly styles — show only clinical note */
+@media print {
+  body { background: white !important; }
+  .print\:hidden { display: none !important; }
+  .print\:w-full { width: 100% !important; }
+  .print\:border-0 { border: none !important; }
+  header, nav, footer, .action-bar { display: none !important; }
+}
+
+/* Shimmer animation for skeleton loaders */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.animate-shimmer {
+  background: linear-gradient(90deg, #F4F1EB 25%, #E8E4DC 50%, #F4F1EB 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
