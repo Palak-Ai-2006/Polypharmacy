@@ -194,7 +194,7 @@ export function AnalysisResultsPanel() {
           )}
 
           {/* AI Reasoning Trace */}
-          {rawCollisionMap && (
+          {rawCollisionMap != null && (
             <details className="mt-4 text-xs text-gray-500">
               <summary className="cursor-pointer font-medium select-none hover:text-gray-700">
                 🔍 View AI Reasoning Trace
