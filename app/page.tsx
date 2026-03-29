@@ -84,11 +84,17 @@ const RISK_ORDER = { CRITICAL: 0, HIGH: 1, MODERATE: 2, LOW: 3 } as const
 
 const DEMOS = [
   {
-    // Bionano/myDNA — CYP2D6 Poor, CYP2C9 Intermediate, CYP2C19 Rapid, CYP3A4 Intermediate
-    // Warfarin + Fluconazole is dangerous: CYP2C9 inhibition on top of Intermediate genotype
-    label: "Demo 1 · CRITICAL",
-    description: "Warfarin + Fluconazole (CYP2C9 IM)",
+    label: "CRITICAL",
+    description: "Warfarin + Fluconazole",
+    scenario: "CYP2C9 Intermediate Metabolizer — bleeding risk",
     reportPath: "/reports/patient-demo-1.pdf",
+    patient: {
+      name: "Margaret Chen", id: "MRN-00142", age: "72", sex: "female",
+      weight: "58", height: "162", allergies: "Penicillin",
+      diagnosis: "Atrial fibrillation, Candida infection",
+      alcohol: "none", tobacco: "former", liver: "normal", kidney: "mild",
+    },
+    vitals: { bp: "138/86", hr: "72", temp: "37.1", rr: "16", spo2: "97" },
     drugs: [
       { rxcui: "1", name: "Warfarin" },
       { rxcui: "33", name: "Fluconazole" },
@@ -98,11 +104,17 @@ const DEMOS = [
     fallbackProfile: { CYP3A4: "Intermediate", CYP2D6: "Poor", CYP2C19: "Rapid", CYP2C9: "Intermediate" },
   },
   {
-    // Genomind — CYP2D6 Poor, all others Normal
-    // Codeine + Paroxetine: CYP2D6 inhibition on Poor metabolizer → codeine toxicity risk
-    label: "Demo 2 · HIGH",
-    description: "Codeine + Paroxetine (CYP2D6 PM)",
+    label: "HIGH",
+    description: "Codeine + Paroxetine",
+    scenario: "CYP2D6 Poor Metabolizer — opioid toxicity risk",
     reportPath: "/reports/patient-demo-2.pdf",
+    patient: {
+      name: "James Wilson", id: "MRN-00289", age: "45", sex: "male",
+      weight: "82", height: "178", allergies: "None known",
+      diagnosis: "Chronic back pain, Major depressive disorder",
+      alcohol: "occasional", tobacco: "never", liver: "normal", kidney: "normal",
+    },
+    vitals: { bp: "124/78", hr: "68", temp: "36.8", rr: "14", spo2: "99" },
     drugs: [
       { rxcui: "16", name: "Codeine" },
       { rxcui: "20", name: "Paroxetine" },
@@ -111,11 +123,17 @@ const DEMOS = [
     fallbackProfile: { CYP3A4: "Normal", CYP2D6: "Poor", CYP2C19: "Normal", CYP2C9: "Normal" },
   },
   {
-    // Medicover — CYP2C19 Poor, CYP2D6 Intermediate
-    // Clopidogrel + Omeprazole: classic CPIC interaction — CYP2C19 PM can't activate clopidogrel
-    label: "Demo 3 · CRITICAL",
-    description: "Clopidogrel + Omeprazole (CYP2C19 PM)",
+    label: "CRITICAL",
+    description: "Clopidogrel + Omeprazole",
+    scenario: "CYP2C19 Poor Metabolizer — antiplatelet failure",
     reportPath: "/reports/patient-demo-3.pdf",
+    patient: {
+      name: "Robert Park", id: "MRN-00371", age: "65", sex: "male",
+      weight: "88", height: "175", allergies: "Aspirin (GI intolerance)",
+      diagnosis: "Post-MI antiplatelet therapy, GERD",
+      alcohol: "none", tobacco: "former", liver: "normal", kidney: "mild",
+    },
+    vitals: { bp: "142/90", hr: "76", temp: "37.0", rr: "15", spo2: "96" },
     drugs: [
       { rxcui: "2", name: "Clopidogrel" },
       { rxcui: "3", name: "Omeprazole" },
@@ -124,11 +142,17 @@ const DEMOS = [
     fallbackProfile: { CYP3A4: "Normal", CYP2D6: "Intermediate", CYP2C19: "Poor", CYP2C9: "Normal" },
   },
   {
-    // RPRD Diagnostics — CYP2D6 Poor, all others Normal
-    // Tamoxifen + Paroxetine: CYP2D6 required to activate tamoxifen → reduced efficacy in breast cancer
-    label: "Demo 4 · HIGH",
-    description: "Tamoxifen + Paroxetine (CYP2D6 PM)",
+    label: "HIGH",
+    description: "Tamoxifen + Paroxetine",
+    scenario: "CYP2D6 Poor Metabolizer — reduced cancer efficacy",
     reportPath: "/reports/patient-demo-4.pdf",
+    patient: {
+      name: "Sarah Mitchell", id: "MRN-00458", age: "52", sex: "female",
+      weight: "67", height: "165", allergies: "Sulfa drugs",
+      diagnosis: "ER+ Breast cancer, Depression",
+      alcohol: "none", tobacco: "never", liver: "normal", kidney: "normal",
+    },
+    vitals: { bp: "118/74", hr: "70", temp: "36.9", rr: "14", spo2: "98" },
     drugs: [
       { rxcui: "30", name: "Tamoxifen" },
       { rxcui: "20", name: "Paroxetine" },
@@ -181,12 +205,25 @@ export default function PolyPGxPage() {
   // Provider state
   const [providerName] = useState("Dr. Demo")
 
+  // View state
+  const [view, setView] = useState<"landing" | "analysis">("landing")
+  const [landingName, setLandingName] = useState("")
+  const [landingId, setLandingId] = useState("")
+
   // Patient state
   const [patientName, setPatientName] = useState("")
+  const [patientId, setPatientId] = useState("")
   const [patientAge, setPatientAge] = useState("")
   const [patientSex, setPatientSex] = useState("")
   const [patientWeight, setPatientWeight] = useState("")
   const [patientHeight, setPatientHeight] = useState("")
+
+  // Vitals
+  const [patientBP, setPatientBP] = useState("")
+  const [patientHR, setPatientHR] = useState("")
+  const [patientTemp, setPatientTemp] = useState("")
+  const [patientRR, setPatientRR] = useState("")
+  const [patientSpO2, setPatientSpO2] = useState("")
 
   // Clinical context (display only)
   const [allergies, setAllergies] = useState("")
@@ -290,11 +327,29 @@ export default function PolyPGxPage() {
   }
 
   const loadDemo = (demo: typeof DEMOS[number]) => {
+    setPatientName(demo.patient.name)
+    setPatientId(demo.patient.id)
+    setPatientAge(demo.patient.age)
+    setPatientSex(demo.patient.sex)
+    setPatientWeight(demo.patient.weight)
+    setPatientHeight(demo.patient.height)
+    setAllergies(demo.patient.allergies)
+    setDiagnosis(demo.patient.diagnosis)
+    setAlcohol(demo.patient.alcohol)
+    setTobacco(demo.patient.tobacco)
+    setLiverFunction(demo.patient.liver)
+    setKidneyFunction(demo.patient.kidney)
+    setPatientBP(demo.vitals.bp)
+    setPatientHR(demo.vitals.hr)
+    setPatientTemp(demo.vitals.temp)
+    setPatientRR(demo.vitals.rr)
+    setPatientSpO2(demo.vitals.spo2)
     setSelectedDrugs(demo.drugs)
     setGeneticProfile(demo.fallbackProfile)
     setReportUrl(demo.reportPath)
     setShowAnalysis(false)
     setAnalysisResult(null)
+    setView("analysis")
   }
 
   const analyzeInteractions = async () => {
@@ -370,23 +425,117 @@ export default function PolyPGxPage() {
     return [...analysisResult.drugIssues].sort((a, b) => RISK_ORDER[a.riskLevel] - RISK_ORDER[b.riskLevel])
   }, [analysisResult?.drugIssues])
 
+  // Shared header
+  const Header = ({ showBack }: { showBack?: boolean }) => (
+    <header className="h-10 min-h-10 bg-white border-b border-[#E8E4DC] flex items-center justify-between px-4 shrink-0">
+      <div className="flex items-center gap-2">
+        <Dna className="h-5 w-5 text-[#064F6E]" />
+        <span className="text-lg font-bold text-[#12354E]">PolyPGx</span>
+        <span className="text-[#E8E4DC]">·</span>
+        <span className="text-xs text-[#5A6B7A]">Clinical Interaction Analyzer</span>
+        {showBack && (
+          <>
+            <span className="text-[#E8E4DC] ml-2">·</span>
+            <button
+              onClick={() => setView("landing")}
+              className="text-xs text-[#5A6B7A] hover:text-[#064F6E] ml-1"
+            >
+              ← Patients
+            </button>
+          </>
+        )}
+      </div>
+      <div className="border-l border-[#E8E4DC] pl-3">
+        <span className="text-[10px] uppercase tracking-[0.2em] text-[#5A6B7A] font-medium">
+          FOR RESEARCH USE ONLY
+        </span>
+      </div>
+    </header>
+  )
+
+  // Landing view
+  if (view === "landing") return (
+    <TooltipProvider>
+      <div className="h-screen bg-[#F4F1EB] flex flex-col">
+        <Header />
+        <main className="flex-1 flex flex-col items-center justify-center gap-8 px-6 overflow-y-auto py-8">
+          {/* New patient card */}
+          <div className="bg-white border border-[#E8E4DC] rounded-lg p-6 w-full max-w-md shadow-sm">
+            <div className="flex items-center gap-2 mb-4">
+              <User className="h-4 w-4 text-[#5A6B7A]" />
+              <h2 className="text-sm font-semibold text-[#12354E]">Open Patient Chart</h2>
+            </div>
+            <div className="flex flex-col gap-2">
+              <input
+                type="text"
+                value={landingName}
+                onChange={(e) => setLandingName(e.target.value)}
+                placeholder="Patient Name"
+                className="h-9 text-sm text-[#12354E] bg-[#F4F1EB] border border-[#E8E4DC] rounded-md outline-none focus:border-[#064F6E] px-3"
+              />
+              <input
+                type="text"
+                value={landingId}
+                onChange={(e) => setLandingId(e.target.value)}
+                placeholder="MRN / Patient ID"
+                className="h-9 text-sm text-[#12354E] bg-[#F4F1EB] border border-[#E8E4DC] rounded-md outline-none focus:border-[#064F6E] px-3"
+              />
+              <button
+                onClick={() => {
+                  setPatientName(landingName)
+                  setPatientId(landingId)
+                  setView("analysis")
+                }}
+                className="mt-1 h-9 bg-[#064F6E] text-white text-sm font-medium rounded-md hover:bg-[#12354E] transition-colors"
+              >
+                Open Chart →
+              </button>
+            </div>
+          </div>
+
+          {/* Demo cases */}
+          <div className="w-full max-w-2xl">
+            <p className="text-[10px] uppercase tracking-wider text-[#5A6B7A] font-medium mb-3">
+              Or load a demo case
+            </p>
+            <div className="grid grid-cols-2 gap-3">
+              {DEMOS.map((demo) => (
+                <button
+                  key={demo.patient.id}
+                  onClick={() => loadDemo(demo)}
+                  className="bg-white border border-[#E8E4DC] rounded-lg p-4 text-left hover:border-[#064F6E] hover:shadow-sm transition-all group"
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${
+                      demo.label === "CRITICAL"
+                        ? "bg-[#C0392B] text-white"
+                        : "bg-[#E67E22] text-white"
+                    }`}>
+                      {demo.label}
+                    </span>
+                    <span className="text-[10px] text-[#5A6B7A]">{demo.patient.id}</span>
+                  </div>
+                  <div className="text-sm font-semibold text-[#12354E] group-hover:text-[#064F6E]">
+                    {demo.patient.name}
+                  </div>
+                  <div className="text-[10px] text-[#5A6B7A] mt-0.5">
+                    {demo.patient.age}{demo.patient.sex === "female" ? "F" : "M"} · {demo.patient.diagnosis.split(",")[0]}
+                  </div>
+                  <div className="text-xs text-[#12354E] mt-2 font-medium">{demo.description}</div>
+                  <div className="text-[10px] text-[#5A6B7A] mt-0.5">{demo.scenario}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </main>
+      </div>
+    </TooltipProvider>
+  )
+
   return (
     <TooltipProvider>
       <div className="h-screen overflow-hidden bg-[#FDFBF7] flex flex-col">
-        {/* Header - 40px */}
-        <header className="h-10 min-h-10 bg-white border-b border-[#E8E4DC] flex items-center justify-between px-4">
-          <div className="flex items-center gap-2">
-            <Dna className="h-5 w-5 text-[#064F6E]" />
-            <span className="text-lg font-bold text-[#12354E]">PolyPGx</span>
-            <span className="text-[#E8E4DC]">·</span>
-            <span className="text-xs text-[#5A6B7A]">Clinical Interaction Analyzer</span>
-          </div>
-          <div className="border-l border-[#E8E4DC] pl-3">
-            <span className="text-[10px] uppercase tracking-[0.2em] text-[#5A6B7A] font-medium">
-              FOR RESEARCH USE ONLY
-            </span>
-          </div>
-        </header>
+        <Header showBack />
 
         {/* Main content area */}
         <div className="flex flex-1 overflow-hidden">
@@ -497,7 +646,15 @@ export default function PolyPGxPage() {
                       type="text"
                       value={patientName}
                       onChange={(e) => setPatientName(e.target.value)}
-                      placeholder="Patient ID"
+                      placeholder="—"
+                      className="h-7 text-sm text-[#12354E] bg-transparent border-0 border-b border-[#E8E4DC] rounded-none outline-none focus:border-[#064F6E] px-1"
+                    />
+                    <span className="text-[10px] uppercase tracking-wider text-[#5A6B7A] font-medium text-right">MRN</span>
+                    <input
+                      type="text"
+                      value={patientId}
+                      onChange={(e) => setPatientId(e.target.value)}
+                      placeholder="—"
                       className="h-7 text-sm text-[#12354E] bg-transparent border-0 border-b border-[#E8E4DC] rounded-none outline-none focus:border-[#064F6E] px-1"
                     />
                     <span className="text-[10px] uppercase tracking-wider text-[#5A6B7A] font-medium text-right">Age</span>
@@ -537,6 +694,26 @@ export default function PolyPGxPage() {
                         placeholder="cm"
                         className="w-12 h-7 text-sm text-[#12354E] bg-transparent border-0 border-b border-[#E8E4DC] rounded-none outline-none focus:border-[#064F6E] px-1 text-center"
                       />
+                    </div>
+                    <span className="text-[10px] uppercase tracking-wider text-[#5A6B7A] font-medium text-right">Vitals</span>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {[
+                        { label: "BP", value: patientBP, set: setPatientBP, w: "w-14" },
+                        { label: "HR", value: patientHR, set: setPatientHR, w: "w-8" },
+                        { label: "T°", value: patientTemp, set: setPatientTemp, w: "w-10" },
+                        { label: "SpO2", value: patientSpO2, set: setPatientSpO2, w: "w-8" },
+                      ].map(({ label, value, set, w }) => (
+                        <div key={label} className="flex items-center gap-0.5">
+                          <span className="text-[9px] text-[#5A6B7A]">{label}</span>
+                          <input
+                            type="text"
+                            value={value}
+                            onChange={(e) => set(e.target.value)}
+                            placeholder="—"
+                            className={`${w} h-6 text-xs text-[#12354E] bg-transparent border-0 border-b border-[#E8E4DC] rounded-none outline-none focus:border-[#064F6E] px-0.5 text-center`}
+                          />
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </div>
@@ -673,20 +850,6 @@ export default function PolyPGxPage() {
                   </div>
                 </div>
               </div>
-            </div>
-
-            {/* Demo Bar */}
-            <div className="h-8 min-h-8 border-b border-[#E8E4DC] bg-[#F4F1EB] px-4 flex items-center gap-2">
-              <span className="text-[10px] uppercase tracking-wider text-[#5A6B7A] font-medium mr-1">Load Demo:</span>
-              {DEMOS.map((demo) => (
-                <button
-                  key={demo.label}
-                  onClick={() => loadDemo(demo)}
-                  className="text-[10px] px-2 py-0.5 rounded border border-[#E8E4DC] text-[#5A6B7A] hover:border-[#064F6E] hover:text-[#064F6E] bg-white"
-                >
-                  {demo.label}
-                </button>
-              ))}
             </div>
 
             {/* Action Bar - 40px */}
