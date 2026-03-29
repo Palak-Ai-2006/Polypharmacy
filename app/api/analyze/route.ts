@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server"
 import { detectCollisions } from "@/lib/collision-detector"
 import { runLLMAnalysis } from "@/lib/rag-chain"
-import type { PatientInput, MetabolizerPhenotype } from "@/lib/types"
+import { fetchOpenFDABatch } from "@/lib/openfda"
+import { retrieveRAGContext } from "@/lib/retriever"
+import type { PatientInput, MetabolizerPhenotype, OpenFDADrugInfo } from "@/lib/types"
 
 function normalizePhenotype(val: string): MetabolizerPhenotype {
   // UI sends "Normal", "Poor", "Ultra-rapid" etc — lib expects lowercase
@@ -11,6 +13,18 @@ function normalizePhenotype(val: string): MetabolizerPhenotype {
   }
   const lower = val.toLowerCase()
   return (map[lower] ?? lower) as MetabolizerPhenotype
+}
+
+function buildOpenFDAContext(data: OpenFDADrugInfo[]): string {
+  const lines = data
+    .filter((d) => d.warnings.length || d.drugInteractions.length)
+    .map((d) => {
+      const parts = [`Drug: ${d.drugName}`]
+      if (d.warnings.length) parts.push(`  Warnings: ${d.warnings.join(" | ")}`)
+      if (d.drugInteractions.length) parts.push(`  Interactions: ${d.drugInteractions.join(" | ")}`)
+      return parts.join("\n")
+    })
+  return lines.length ? `## FDA Drug Safety Data\n${lines.join("\n\n")}` : ""
 }
 
 export async function POST(request: NextRequest) {
@@ -36,8 +50,17 @@ export async function POST(request: NextRequest) {
     // Layer 2: deterministic collision detection
     const collisionMap = detectCollisions(patientInput)
 
-    // Layer 4: Gemini reasoning (graceful fallback if no API key)
-    const analysis = await runLLMAnalysis(patientInput, collisionMap)
+    // Layer 3: RAG + OpenFDA enrichment (run in parallel, both gracefully skip on failure)
+    const drugNames = (patient.drugs as { name: string }[]).map((d) => d.name)
+    const [fdaData, ragContext] = await Promise.all([
+      fetchOpenFDABatch(drugNames),
+      retrieveRAGContext(drugNames),
+    ])
+    const openfdaContext = buildOpenFDAContext(fdaData)
+    const combinedContext = [ragContext, openfdaContext].filter(Boolean).join("\n\n")
+
+    // Layer 4: Gemini reasoning with full context
+    const analysis = await runLLMAnalysis(patientInput, collisionMap, combinedContext)
 
     // Map PhenoconversionEvent fields → {from, to} that page.tsx expects
     const phenoconversions = collisionMap.phenoconversions.map((p) => ({
