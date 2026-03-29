@@ -7,6 +7,10 @@ import { logEnvironmentCheck } from "@/lib/env-check"
 import { calculateSeverityScore } from "@/lib/severity-scorer"
 import type { PatientInput, MetabolizerPhenotype, OpenFDADrugInfo } from "@/lib/types"
 
+export const runtime = "nodejs"
+export const dynamic = "force-dynamic"
+export const maxDuration = 60
+
 // Validate environment on first import (server startup)
 logEnvironmentCheck();
 

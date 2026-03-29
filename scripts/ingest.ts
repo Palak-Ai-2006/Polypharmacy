@@ -1,15 +1,16 @@
 // ============================================================
 // RAG Ingestion Script — run ONCE to build the vector DB
 // Usage: npx ts-node scripts/ingest.ts
-// Requires: ChromaDB running at localhost:8000
+// Requires: ChromaDB running locally OR remote CHROMA_URL set
 //   pip install chromadb
 //   chroma run --port 8000 --path ./chroma_db
 // ============================================================
 
-import { ChromaClient } from "chromadb";
+import { ChromaClient, CloudClient } from "chromadb";
 import { DefaultEmbeddingFunction } from "@chroma-core/default-embed";
 
 const COLLECTION_NAME = "pharmgkb_cpic";
+const CHROMA_URL = process.env.CHROMA_URL ?? "http://localhost:8000";
 
 // Clinically accurate CPIC + PharmGKB knowledge chunks
 const KNOWLEDGE_BASE = [
@@ -86,8 +87,30 @@ const KNOWLEDGE_BASE = [
 ];
 
 async function ingest() {
-  console.log("Connecting to ChromaDB at http://localhost:8000...");
-  const client = new ChromaClient({ host: "localhost", port: 8000, ssl: false });
+  const useCloud =
+    Boolean(process.env.CHROMA_API_KEY) &&
+    Boolean(process.env.CHROMA_TENANT) &&
+    Boolean(process.env.CHROMA_DATABASE);
+
+  const client = useCloud
+    ? new CloudClient({
+        apiKey: process.env.CHROMA_API_KEY,
+        tenant: process.env.CHROMA_TENANT,
+        database: process.env.CHROMA_DATABASE,
+      })
+    : (() => {
+        const chromaUrl = new URL(CHROMA_URL);
+        const host = chromaUrl.hostname;
+        const port = Number(chromaUrl.port || (chromaUrl.protocol === "https:" ? 443 : 80));
+        const ssl = chromaUrl.protocol === "https:";
+        return new ChromaClient({ host, port, ssl });
+      })();
+
+  console.log(
+    useCloud
+      ? "Connecting to Chroma Cloud..."
+      : `Connecting to ChromaDB at ${CHROMA_URL}...`
+  );
 
   const embedder = new DefaultEmbeddingFunction();
 
@@ -99,11 +122,25 @@ async function ingest() {
     // Collection didn't exist — that's fine
   }
 
-  const collection = await client.createCollection({
-    name: COLLECTION_NAME,
-    embeddingFunction: embedder,
-    metadata: { "hnsw:space": "cosine" },
-  });
+  let collection;
+  try {
+    collection = await client.createCollection({
+      name: COLLECTION_NAME,
+      embeddingFunction: embedder,
+      metadata: { "hnsw:space": "cosine" },
+    });
+  } catch (error) {
+    // Some hosted/cloud setups reject legacy metadata keys.
+    // Retry with minimal options so ingestion can proceed.
+    console.warn(
+      "Collection create with metadata failed; retrying without metadata:",
+      error instanceof Error ? error.message : String(error)
+    );
+    collection = await client.createCollection({
+      name: COLLECTION_NAME,
+      embeddingFunction: embedder,
+    });
+  }
 
   console.log(`Ingesting ${KNOWLEDGE_BASE.length} documents...`);
 
