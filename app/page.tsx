@@ -82,6 +82,62 @@ const riskColors = {
 
 const RISK_ORDER = { CRITICAL: 0, HIGH: 1, MODERATE: 2, LOW: 3 } as const
 
+const DEMOS = [
+  {
+    // Bionano/myDNA — CYP2D6 Poor, CYP2C9 Intermediate, CYP2C19 Rapid, CYP3A4 Intermediate
+    // Warfarin + Fluconazole is dangerous: CYP2C9 inhibition on top of Intermediate genotype
+    label: "Demo 1 · CRITICAL",
+    description: "Warfarin + Fluconazole (CYP2C9 IM)",
+    reportPath: "/reports/patient-demo-1.pdf",
+    drugs: [
+      { rxcui: "1", name: "Warfarin" },
+      { rxcui: "33", name: "Fluconazole" },
+      { rxcui: "3", name: "Omeprazole" },
+      { rxcui: "2", name: "Clopidogrel" },
+    ],
+    fallbackProfile: { CYP3A4: "Intermediate", CYP2D6: "Poor", CYP2C19: "Rapid", CYP2C9: "Intermediate" },
+  },
+  {
+    // Genomind — CYP2D6 Poor, all others Normal
+    // Codeine + Paroxetine: CYP2D6 inhibition on Poor metabolizer → codeine toxicity risk
+    label: "Demo 2 · HIGH",
+    description: "Codeine + Paroxetine (CYP2D6 PM)",
+    reportPath: "/reports/patient-demo-2.pdf",
+    drugs: [
+      { rxcui: "16", name: "Codeine" },
+      { rxcui: "20", name: "Paroxetine" },
+      { rxcui: "15", name: "Metoprolol" },
+    ],
+    fallbackProfile: { CYP3A4: "Normal", CYP2D6: "Poor", CYP2C19: "Normal", CYP2C9: "Normal" },
+  },
+  {
+    // Medicover — CYP2C19 Poor, CYP2D6 Intermediate
+    // Clopidogrel + Omeprazole: classic CPIC interaction — CYP2C19 PM can't activate clopidogrel
+    label: "Demo 3 · CRITICAL",
+    description: "Clopidogrel + Omeprazole (CYP2C19 PM)",
+    reportPath: "/reports/patient-demo-3.pdf",
+    drugs: [
+      { rxcui: "2", name: "Clopidogrel" },
+      { rxcui: "3", name: "Omeprazole" },
+      { rxcui: "32", name: "Voriconazole" },
+    ],
+    fallbackProfile: { CYP3A4: "Normal", CYP2D6: "Intermediate", CYP2C19: "Poor", CYP2C9: "Normal" },
+  },
+  {
+    // RPRD Diagnostics — CYP2D6 Poor, all others Normal
+    // Tamoxifen + Paroxetine: CYP2D6 required to activate tamoxifen → reduced efficacy in breast cancer
+    label: "Demo 4 · HIGH",
+    description: "Tamoxifen + Paroxetine (CYP2D6 PM)",
+    reportPath: "/reports/patient-demo-4.pdf",
+    drugs: [
+      { rxcui: "30", name: "Tamoxifen" },
+      { rxcui: "20", name: "Paroxetine" },
+      { rxcui: "24", name: "Venlafaxine" },
+    ],
+    fallbackProfile: { CYP3A4: "Normal", CYP2D6: "Poor", CYP2C19: "Normal", CYP2C9: "Normal" },
+  },
+]
+
 const enzymeColors: Record<string, string> = {
   CYP3A4: "#064F6E",
   CYP2D6: "#F99D1B",
@@ -167,6 +223,10 @@ export default function PolyPGxPage() {
   const [copied, setCopied] = useState(false)
   const [currentTimestamp, setCurrentTimestamp] = useState("")
 
+  // Lab DNA report
+  const [reportUrl, setReportUrl] = useState<string | null>(null)
+  const [isParsing, setIsParsing] = useState(false)
+
   // Set timestamp on client only to avoid hydration mismatch
   useEffect(() => {
     setCurrentTimestamp(
@@ -227,6 +287,28 @@ export default function PolyPGxPage() {
 
   const removeDrug = (rxcui: string) => {
     setSelectedDrugs((prev) => prev.filter((d) => d.rxcui !== rxcui))
+  }
+
+  const loadDemo = async (demo: typeof DEMOS[number]) => {
+    setSelectedDrugs(demo.drugs)
+    setGeneticProfile(demo.fallbackProfile)
+    setReportUrl(demo.reportPath)
+    setShowAnalysis(false)
+    setAnalysisResult(null)
+    setIsParsing(true)
+    try {
+      const res = await fetch("/api/parse-pgx-report", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reportUrl: demo.reportPath }),
+      })
+      const data = await res.json()
+      if (!data.error) setGeneticProfile((p) => ({ ...p, ...data }))
+    } catch {
+      // fallbackProfile already set above
+    } finally {
+      setIsParsing(false)
+    }
   }
 
   const analyzeInteractions = async () => {
@@ -553,15 +635,28 @@ export default function PolyPGxPage() {
                     <div className="flex items-center gap-1.5">
                       <FlaskConical className="h-3 w-3 text-[#5A6B7A]" />
                       <span className="text-[10px] uppercase tracking-wider text-[#5A6B7A] font-medium">Pharmacogenomics</span>
+                      {isParsing && <Loader2 className="h-3 w-3 text-[#5A6B7A] animate-spin" />}
                     </div>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <Info className="h-3 w-3 text-[#5A6B7A]" />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p className="text-xs">Based on pharmacogenomic test results (e.g., GeneSight, OneOme).</p>
-                      </TooltipContent>
-                    </Tooltip>
+                    <div className="flex items-center gap-1.5">
+                      {reportUrl && (
+                        <a
+                          href={reportUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-[10px] text-[#064F6E] underline hover:text-[#12354E]"
+                        >
+                          View Report
+                        </a>
+                      )}
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <Info className="h-3 w-3 text-[#5A6B7A]" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p className="text-xs">Sourced from patient's pharmacogenomic lab report.</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
                   </div>
                   <div className="flex flex-col gap-1.5">
                     {(["CYP3A4", "CYP2D6", "CYP2C19", "CYP2C9"] as const).map((enzyme) => (
@@ -592,6 +687,20 @@ export default function PolyPGxPage() {
                   </div>
                 </div>
               </div>
+            </div>
+
+            {/* Demo Bar */}
+            <div className="h-8 min-h-8 border-b border-[#E8E4DC] bg-[#F4F1EB] px-4 flex items-center gap-2">
+              <span className="text-[10px] uppercase tracking-wider text-[#5A6B7A] font-medium mr-1">Load Demo:</span>
+              {DEMOS.map((demo) => (
+                <button
+                  key={demo.label}
+                  onClick={() => loadDemo(demo)}
+                  className="text-[10px] px-2 py-0.5 rounded border border-[#E8E4DC] text-[#5A6B7A] hover:border-[#064F6E] hover:text-[#064F6E] bg-white"
+                >
+                  {demo.label}
+                </button>
+              ))}
             </div>
 
             {/* Action Bar - 40px */}
