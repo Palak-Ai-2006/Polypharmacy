@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef, useMemo } from "react"
+import { toast } from "sonner"
 import {
   Dna,
   Search,
@@ -69,6 +70,9 @@ interface AnalysisResult {
   summary: string
   enzymeActivity: EnzymeData[]
   drugIssues: DrugIssue[]
+  unmatchedDrugs?: string[]
+  rawCollisionMap?: unknown
+  ragContext?: string | null
 }
 
 // Risk colors
@@ -359,6 +363,7 @@ export default function PolyPGxPage() {
     setShowAnalysis(false)
     setAnalysisResult(null)
     setView("analysis")
+    setTimeout(() => analyzeInteractions(), 100)
   }
 
   const analyzeInteractions = async () => {
@@ -414,10 +419,13 @@ export default function PolyPGxPage() {
               mechanism: issue.mechanism,
             })
           ) || [],
+        unmatchedDrugs: data.collisionMap?.unmatchedDrugs ?? [],
+        rawCollisionMap: data.collisionMap,
+        ragContext: data.ragContext,
       })
       setShowAnalysis(true)
     } catch {
-      // Handle error silently
+      toast.error("Analysis failed. Please try again.")
     } finally {
       setIsAnalyzing(false)
     }
@@ -960,6 +968,14 @@ export default function PolyPGxPage() {
               <div className="w-[58%] border border-[#E8E4DC] rounded-lg bg-[#FDFBF7] overflow-y-auto scrollbar-hide">
                 {showAnalysis && analysisResult && (
                   <div className="p-4">
+                    {analysisResult.unmatchedDrugs && analysisResult.unmatchedDrugs.length > 0 && (
+                      <div className="bg-yellow-50 border border-yellow-300 rounded-md p-3 mb-4">
+                        <p className="text-sm text-yellow-800 font-medium">⚠️ Drugs not in our database:</p>
+                        <p className="text-sm text-yellow-700">
+                          {analysisResult.unmatchedDrugs.join(", ")} — results may be incomplete.
+                        </p>
+                      </div>
+                    )}
                     {/* Risk Banner */}
                     <div
                       className={`rounded-md p-3 border-l-[3px] ${riskColors[analysisResult.overallRisk].border} ${riskColors[analysisResult.overallRisk].light} animate-section-1`}
@@ -1063,6 +1079,29 @@ export default function PolyPGxPage() {
                         </Accordion>
                       </div>
                     )}
+
+                    {/* AI Reasoning Trace */}
+                    <details className="mt-4 text-xs text-gray-500">
+                      <summary className="cursor-pointer font-medium select-none hover:text-gray-700">
+                        🔍 View AI Reasoning Trace
+                      </summary>
+                      <div className="mt-2 space-y-3">
+                        <div>
+                          <p className="font-medium text-gray-600 mb-1">Collision Map (deterministic engine)</p>
+                          <pre className="bg-gray-100 p-3 rounded overflow-auto max-h-64 text-[10px] leading-relaxed">
+                            {JSON.stringify(analysisResult.rawCollisionMap, null, 2)}
+                          </pre>
+                        </div>
+                        {analysisResult.ragContext && (
+                          <div>
+                            <p className="font-medium text-gray-600 mb-1">RAG Context (retrieved chunks)</p>
+                            <pre className="bg-gray-100 p-3 rounded overflow-auto max-h-64 text-[10px] leading-relaxed whitespace-pre-wrap">
+                              {analysisResult.ragContext}
+                            </pre>
+                          </div>
+                        )}
+                      </div>
+                    </details>
 
                     {/* Sources footnote */}
                     <div className="mt-6 text-center animate-section-4">

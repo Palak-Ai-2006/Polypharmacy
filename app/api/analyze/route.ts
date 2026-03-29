@@ -74,7 +74,9 @@ export async function POST(request: NextRequest) {
         collisions: collisionMap.collisions,
         phenoconversions,
         overallRisk: collisionMap.overallRisk,
+        unmatchedDrugs: collisionMap.unmatchedDrugs,
       },
+      ragContext: combinedContext || null,
       analysis: {
         overallRiskLevel: analysis.overallRiskLevel,
         summary: analysis.summary,
