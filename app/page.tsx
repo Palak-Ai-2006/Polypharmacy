@@ -95,6 +95,7 @@ const DEMOS = [
       alcohol: "none", tobacco: "former", liver: "normal", kidney: "mild",
     },
     vitals: { bp: "138/86", hr: "72", temp: "37.1", rr: "16", spo2: "97" },
+    primaryDoc: { name: "Dr. Helen Foster", specialty: "Cardiology", hospital: "St. Mary's Medical Center", phone: "(617) 555-0142" },
     drugs: [
       { rxcui: "1", name: "Warfarin" },
       { rxcui: "33", name: "Fluconazole" },
@@ -115,6 +116,7 @@ const DEMOS = [
       alcohol: "occasional", tobacco: "never", liver: "normal", kidney: "normal",
     },
     vitals: { bp: "124/78", hr: "68", temp: "36.8", rr: "14", spo2: "99" },
+    primaryDoc: { name: "Dr. Marcus Webb", specialty: "Pain Management", hospital: "Riverside Community Hospital", phone: "(312) 555-0289" },
     drugs: [
       { rxcui: "16", name: "Codeine" },
       { rxcui: "20", name: "Paroxetine" },
@@ -134,6 +136,7 @@ const DEMOS = [
       alcohol: "none", tobacco: "former", liver: "normal", kidney: "mild",
     },
     vitals: { bp: "142/90", hr: "76", temp: "37.0", rr: "15", spo2: "96" },
+    primaryDoc: { name: "Dr. Sunita Rao", specialty: "Interventional Cardiology", hospital: "Northwest Heart Institute", phone: "(503) 555-0371" },
     drugs: [
       { rxcui: "2", name: "Clopidogrel" },
       { rxcui: "3", name: "Omeprazole" },
@@ -153,6 +156,7 @@ const DEMOS = [
       alcohol: "none", tobacco: "never", liver: "normal", kidney: "normal",
     },
     vitals: { bp: "118/74", hr: "70", temp: "36.9", rr: "14", spo2: "98" },
+    primaryDoc: { name: "Dr. Patricia Lim", specialty: "Oncology", hospital: "Cedar Valley Cancer Center", phone: "(415) 555-0458" },
     drugs: [
       { rxcui: "30", name: "Tamoxifen" },
       { rxcui: "20", name: "Paroxetine" },
@@ -203,7 +207,11 @@ Signature: _________________________`
 
 export default function PolyPGxPage() {
   // Provider state
-  const [providerName] = useState("Dr. Demo")
+  const [providerName] = useState("Dr. Aisha Patel")
+  const [providerDept] = useState("Internal Medicine")
+  const [sessionStart] = useState(() =>
+    new Date().toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit", hour12: true })
+  )
 
   // View state
   const [view, setView] = useState<"landing" | "analysis">("landing")
@@ -259,6 +267,12 @@ export default function PolyPGxPage() {
   const [physicianNotes, setPhysicianNotes] = useState(noteTemplate)
   const [copied, setCopied] = useState(false)
   const [currentTimestamp, setCurrentTimestamp] = useState("")
+
+  // Primary doctor
+  const [primaryDocName, setPrimaryDocName] = useState("")
+  const [primaryDocSpecialty, setPrimaryDocSpecialty] = useState("")
+  const [primaryDocHospital, setPrimaryDocHospital] = useState("")
+  const [primaryDocPhone, setPrimaryDocPhone] = useState("")
 
   // Lab DNA report
   const [reportUrl, setReportUrl] = useState<string | null>(null)
@@ -344,6 +358,10 @@ export default function PolyPGxPage() {
     setPatientTemp(demo.vitals.temp)
     setPatientRR(demo.vitals.rr)
     setPatientSpO2(demo.vitals.spo2)
+    setPrimaryDocName(demo.primaryDoc.name)
+    setPrimaryDocSpecialty(demo.primaryDoc.specialty)
+    setPrimaryDocHospital(demo.primaryDoc.hospital)
+    setPrimaryDocPhone(demo.primaryDoc.phone)
     setSelectedDrugs(demo.drugs)
     setGeneticProfile(demo.fallbackProfile)
     setReportUrl(demo.reportPath)
@@ -584,48 +602,68 @@ export default function PolyPGxPage() {
                 )}
               </div>
 
-              {/* Drug chips area */}
+              {/* Drug table */}
               <div className="flex-1 mt-2 overflow-y-auto scrollbar-hide">
                 {selectedDrugs.length === 0 ? (
                   <div className="text-xs text-[#5A6B7A] text-center py-4">No medications added</div>
                 ) : (
-                  <div className="flex flex-wrap gap-1.5 content-start">
-                    {selectedDrugs.map((drug) => (
-                      <span
+                  <div className="flex flex-col">
+                    {selectedDrugs.map((drug, i) => (
+                      <div
                         key={drug.rxcui}
-                        className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs bg-[#F4F1EB] text-[#12354E] rounded-full ${
+                        className={`flex items-center gap-2 py-1.5 px-1 rounded ${
                           addedDrug === drug.rxcui ? "animate-scale-in" : ""
-                        }`}
+                        } hover:bg-[#F4F1EB] group`}
                       >
-                        {drug.name}
-                        <button onClick={() => removeDrug(drug.rxcui)} className="hover:text-[#C0392B]">
+                        <span className="text-[10px] text-[#5A6B7A] w-4 text-right shrink-0">{i + 1}.</span>
+                        <span className="flex-1 text-sm font-medium text-[#12354E] leading-tight">{drug.name}</span>
+                        <button
+                          onClick={() => removeDrug(drug.rxcui)}
+                          className="opacity-0 group-hover:opacity-100 text-[#5A6B7A] hover:text-[#C0392B] shrink-0"
+                        >
                           <X className="h-3 w-3" />
                         </button>
-                      </span>
+                      </div>
                     ))}
                   </div>
                 )}
               </div>
 
-              {/* Footer line */}
-              <div className="border-t border-[#E8E4DC] pt-2 mt-auto">
-                <span className="text-[10px] text-[#5A6B7A]">{selectedDrugs.length} medication(s)</span>
+              {/* Footer + Primary Doctor */}
+              <div className="mt-auto">
+                <div className="border-t border-[#E8E4DC] pt-2">
+                  <span className="text-[10px] text-[#5A6B7A] px-1">{selectedDrugs.length} medication(s)</span>
+                </div>
+
+                {primaryDocName && (
+                  <div className="border-t border-[#E8E4DC] mt-2 pt-2 px-1">
+                    <div className="flex items-center gap-1 mb-1.5">
+                      <Stethoscope className="h-3 w-3 text-[#5A6B7A]" />
+                      <span className="text-[10px] uppercase tracking-wider text-[#5A6B7A] font-medium">Primary Physician</span>
+                    </div>
+                    <div className="text-sm font-semibold text-[#12354E] leading-tight">{primaryDocName}</div>
+                    <div className="text-xs text-[#5A6B7A] mt-0.5">{primaryDocSpecialty}</div>
+                    <div className="text-[10px] text-[#5A6B7A] mt-0.5 leading-tight">{primaryDocHospital}</div>
+                    <div className="text-[10px] text-[#064F6E] mt-0.5">{primaryDocPhone}</div>
+                  </div>
+                )}
               </div>
             </div>
 
-            {/* Session Indicator - 48px fixed */}
-            <div className="h-12 min-h-12 bg-[#F4F1EB] px-3 flex items-center gap-2 border-t border-[#E8E4DC]">
-              <div className="w-7 h-7 rounded-full bg-white border border-[#E8E4DC] flex items-center justify-center">
-                <CircleUser className="w-4 h-4 text-[#064F6E]" />
+            {/* Session Indicator */}
+            <div className="bg-[#F4F1EB] px-3 py-2.5 flex items-start gap-2.5 border-t border-[#E8E4DC]">
+              <div className="w-8 h-8 rounded-full bg-white border border-[#E8E4DC] flex items-center justify-center shrink-0 mt-0.5">
+                <CircleUser className="w-5 h-5 text-[#064F6E]" />
               </div>
-              <div className="flex-1">
-                <div className="text-xs font-medium text-[#12354E]">{providerName}</div>
-                <div className="flex items-center gap-1 text-[10px] text-[#5A6B7A]">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#27AE60]" />
-                  Active Session
+              <div className="flex-1 min-w-0">
+                <div className="text-sm font-semibold text-[#12354E] leading-tight">{providerName}</div>
+                <div className="text-[10px] text-[#5A6B7A] mt-0.5">{providerDept}</div>
+                <div className="flex items-center gap-1 mt-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#27AE60] shrink-0" />
+                  <span className="text-[10px] text-[#5A6B7A]">Active · {sessionStart}</span>
                 </div>
               </div>
-              <button className="text-[10px] text-[#5A6B7A] underline cursor-pointer">Sign Out</button>
+              <button className="text-[10px] text-[#5A6B7A] underline cursor-pointer shrink-0 mt-0.5">Sign Out</button>
             </div>
           </div>
 
