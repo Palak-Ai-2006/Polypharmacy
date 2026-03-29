@@ -178,7 +178,7 @@ const enzymeColors: Record<string, string> = {
 }
 
 
-export default function PolyPGxPage() {
+export default function ArgusPage() {
   // Provider state
   const [providerName] = useState("Dr. Aisha Patel")
   const [providerDept] = useState("Internal Medicine")
@@ -499,7 +499,7 @@ export default function PolyPGxPage() {
     <header className="h-10 min-h-10 bg-white border-b border-[#E8E4DC] flex items-center justify-between px-4 shrink-0">
       <div className="flex items-center gap-2">
         <Dna className="h-5 w-5 text-[#064F6E]" />
-        <span className="text-lg font-bold text-[#12354E]">PolyPGx</span>
+        <span className="text-lg font-bold text-[#12354E]">Argus</span>
         <span className="text-[#E8E4DC]">·</span>
         <span className="text-xs text-[#5A6B7A]">Clinical Interaction Analyzer</span>
         {showBack && (

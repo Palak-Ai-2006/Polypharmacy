@@ -7,7 +7,7 @@ import './globals.css'
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
-  title: 'PolyPGx - Clinical Drug Interaction Analyzer',
+  title: 'Argus - Clinical Drug Interaction Analyzer',
   description: 'Analyze drug interactions with pharmacogenomic profiling',
   generator: 'v0.app',
   icons: {
