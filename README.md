@@ -1,4 +1,4 @@
-# PolyPGx
+# Argus
 
 Detects dangerous multi-drug, multi-gene interactions using deterministic CYP enzyme collision detection combined with RAG-powered LLM clinical reasoning.
 
@@ -24,7 +24,7 @@ Layers 1 through 3 are entirely deterministic. No AI. The LLM reasons on top of 
 ## Project Structure
 
 ```
-polypgx/
+Argus/
   app/
     page.tsx                  Thin orchestrator: SSE streaming, demo cases (~290 lines)
     layout.tsx                Root layout + SEO metadata
