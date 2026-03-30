@@ -1,17 +1,29 @@
+# PolyPGx
+
 Detects dangerous multi-drug, multi-gene interactions using deterministic CYP enzyme collision detection combined with RAG-powered LLM clinical reasoning.
 
 Built at HackPSU 2026.
 
-Quick Start
+## Quick Start
+
+```bash
 npm install --legacy-peer-deps
 cp .env.example .env.local       # Add your GEMINI_API_KEY
 npm run dev                       # Open http://localhost:3000
-Architecture
+```
+
+## Architecture
+
+```
 Drug Input + RxNorm > CYP Collision Engine > RAG + OpenFDA > Gemini Reasoning > Clinical UI
      Layer 1              Layer 2               Layer 3          Layer 4          Layer 5
+```
+
 Layers 1 through 3 are entirely deterministic. No AI. The LLM reasons on top of verified collision data.
 
-Project Structure
+## Project Structure
+
+```
 polypgx/
   app/
     page.tsx                  Thin orchestrator: SSE streaming, demo cases (~290 lines)
@@ -47,10 +59,14 @@ polypgx/
   scripts/
     ingest.ts                 RAG ingestion: builds ChromaDB collection
   vitest.config.ts            Test configuration with @ path alias
-API Contract
-POST /api/analyze (SSE Streaming)
-Request:
+```
 
+## API Contract
+
+### POST /api/analyze (SSE Streaming)
+
+**Request:**
+```json
 {
   "patient": {
     "name": "Mrs. Chouhan",
@@ -64,35 +80,50 @@ Request:
     }
   }
 }
-Response: Content-Type: text/event-stream
+```
 
-Event	Timing	Payload
-collisions	Instant (<5ms)	Deterministic CYP collision data, phenoconversions, unmatched drugs
-reasoning	During LLM	Streaming reasoning text chunks
-analysis	After LLM	Full result: summary, drug issues, recommendations, sources
-error	On failure	Error message
-done	End	Empty (stream complete)
-GET /api/drugs/search?q=war
-Returns: [{ "rxcui": "...", "name": "warfarin" }]
+**Response:** `Content-Type: text/event-stream`
 
-Environment Variables
-Variable	Required	Description
-GEMINI_API_KEY	Yes	Free at AI Studio
-CHROMA_URL	No	ChromaDB endpoint (default: http://localhost:8000)
-Prerequisites
-Node.js 18+
-npm 9+
-ChromaDB 0.4+ (optional, for RAG layer)
-Testing
+| Event | Timing | Payload |
+|-------|--------|---------|
+| `collisions` | Instant (<5ms) | Deterministic CYP collision data, phenoconversions, unmatched drugs |
+| `reasoning` | During LLM | Streaming reasoning text chunks |
+| `analysis` | After LLM | Full result: summary, drug issues, recommendations, sources |
+| `error` | On failure | Error message |
+| `done` | End | Empty (stream complete) |
+
+### GET /api/drugs/search?q=war
+
+Returns: `[{ "rxcui": "...", "name": "warfarin" }]`
+
+## Environment Variables
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `GEMINI_API_KEY` | Yes | Free at [AI Studio](https://aistudio.google.com) |
+| `CHROMA_URL` | No | ChromaDB endpoint (default: http://localhost:8000) |
+
+## Prerequisites
+
+- Node.js 18+
+- npm 9+
+- ChromaDB 0.4+ (optional, for RAG layer)
+
+## Testing
+
+```bash
 npm test              # Run all 20 unit tests
 npm run test:watch    # Watch mode for development
+```
+
 The test suite validates the deterministic CYP collision detector (Layer 2) across 7 categories: edge cases, substrate+inhibitor collisions, substrate+inducer collisions, polypharmacy scenarios, phenoconversion, risk calculations, and output structure.
 
-Documentation
-Open PolyPGx_Documentation.html for the full project report. Open FutureScope.html for the development roadmap.
+## Documentation
 
-Known Issues
-npm run build may fail under Turbopack due to an upstream ESM/CJS conflict with @chroma-core/default-embed. The development server (npm run dev) works correctly. For production deployment, use Webpack mode.
+Open [PolyPGx_Documentation.html](PolyPGx_Documentation.html) for the full project report. Open [FutureScope.html](FutureScope.html) for the development roadmap.
 
-License
+## Known Issues
+
+`npm run build` may fail under Turbopack due to an upstream ESM/CJS conflict with `@chroma-core/default-embed`. The development server (`npm run dev`) works correctly. For production deployment, use Webpack mode.
+
 Built for HackPSU 2026. All rights reserved.
