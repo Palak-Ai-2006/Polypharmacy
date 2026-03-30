@@ -1,68 +1,56 @@
-# PolyPGx — Polypharmacy Pharmacogenomics Collision Engine
+Detects dangerous multi-drug, multi-gene interactions using deterministic CYP enzyme collision detection combined with RAG-powered LLM clinical reasoning.
 
-Detects dangerous multi-drug, multi-gene interactions using deterministic CYP enzyme collision detection + RAG-powered LLM clinical reasoning.
+Built at HackPSU 2026.
 
-## Quick Start
+Quick Start
+npm install --legacy-peer-deps
+cp .env.example .env.local       # Add your GEMINI_API_KEY
+npm run dev                       # Open http://localhost:3000
+Architecture
+Drug Input + RxNorm > CYP Collision Engine > RAG + OpenFDA > Gemini Reasoning > Clinical UI
+     Layer 1              Layer 2               Layer 3          Layer 4          Layer 5
+Layers 1 through 3 are entirely deterministic. No AI. The LLM reasons on top of verified collision data.
 
-```bash
-# 1. Install dependencies
-npm install
-
-# 2. Copy env and add your API keys
-cp .env.example .env.local
-# Edit .env.local with your ANTHROPIC_API_KEY
-
-# 3. Run dev server
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000).
-
-## Architecture (5 Layers)
-
-```
-User Input → CYP Collision Detector (deterministic) → RAG Retrieval → LLM Reasoning → Output
-```
-
-**Key insight:** The collision detector runs WITHOUT AI. The LLM reasons ON TOP of verified collision data.
-
-## Project Structure
-
-```
+Project Structure
 polypgx/
-├── app/                        # Next.js 14 App Router
-│   ├── page.tsx                # Main UI (replace with v0.dev)
-│   ├── layout.tsx              # Root layout + SEO
-│   ├── globals.css             # Base styles
-│   └── api/
-│       ├── analyze/route.ts    # POST /api/analyze — full pipeline
-│       └── drugs/search/route.ts # GET /api/drugs/search?q= — autocomplete
-├── lib/                        # Core logic
-│   ├── types.ts                # Shared type definitions (THE CONTRACT)
-│   ├── collision-detector.ts   # Layer 2: deterministic CYP collision detection
-│   ├── phenoconversion.ts      # Phenoconversion logic
-│   ├── rag-chain.ts            # Layer 3+4: RAG retrieval + Claude reasoning
-│   ├── openfda.ts              # OpenFDA drug label API
-│   └── rxnorm.ts               # RxNorm drug autocomplete API
-├── data/
-│   ├── cyp_database.json       # THE DATABASE — bio major's file (10 → 60 drugs)
-│   └── README.md               # Instructions for bio major
-└── components/                 # React components (add as needed)
-```
+  app/
+    page.tsx                  Thin orchestrator: SSE streaming, demo cases (~290 lines)
+    layout.tsx                Root layout + SEO metadata
+    error.tsx                 Global error boundary
+    globals.css               Design tokens, print styles, animations
+    api/
+      analyze/route.ts        POST /api/analyze (SSE streaming endpoint)
+      drugs/search/route.ts   GET  /api/drugs/search?q= (RxNorm autocomplete)
+  components/
+    app/
+      AppHeader.tsx           Header bar with branding and navigation
+      DrugSearchPanel.tsx     Drug search, medication list, primary physician
+      PatientInfoSidebar.tsx  Demographics, clinical context, pharmacogenomics
+      AnalysisResultsPanel.tsx Risk banner, enzyme activity, interactions (SSE aware)
+      EnzymeActivityAccordion.tsx Per-enzyme collision display with role badges
+      PhysicianNotesEditor.tsx Clinical notes with copy/print actions
+    ui/                       Shadcn UI primitives (button, select, etc.)
+  lib/
+    store.ts                  Zustand centralized state store
+    types.ts                  Shared TypeScript type contracts
+    collision-detector.ts     Layer 2: Deterministic CYP collision detection
+    phenoconversion.ts        Phenoconversion shift detection
+    env-check.ts              Startup environment variable validation
+    rag-chain.ts              Layer 4: LangChain + Gemini structured reasoning
+    retriever.ts              Layer 3: ChromaDB vector retrieval
+    openfda.ts                Layer 3: FDA drug safety label lookup
+    rxnorm.ts                 Layer 1: RxNorm drug name normalization
+    __tests__/
+      collision-detector.test.ts  20 unit tests for deterministic collision logic
+  data/
+    cyp_database.json         Curated CYP enzyme interaction table
+  scripts/
+    ingest.ts                 RAG ingestion: builds ChromaDB collection
+  vitest.config.ts            Test configuration with @ path alias
+API Contract
+POST /api/analyze (SSE Streaming)
+Request:
 
-## Who Does What
-
-| Role | Files to Own |
-|------|-------------|
-| **CS #1** | `lib/collision-detector.ts`, `lib/rag-chain.ts`, `app/api/` |
-| **CS #2** | `app/page.tsx` (v0.dev), `components/`, Vercel deploy |
-| **BIO** | `data/cyp_database.json`, validate outputs, co-design system prompt |
-| **AD** | UX review, pitch, demo scripts |
-
-## API Contract
-
-### `POST /api/analyze`
-```json
 {
   "patient": {
     "name": "Mrs. Chouhan",
@@ -76,13 +64,35 @@ polypgx/
     }
   }
 }
-```
+Response: Content-Type: text/event-stream
 
-### `GET /api/drugs/search?q=war`
-Returns: `[{ "rxcui": "...", "name": "warfarin" }]`
+Event	Timing	Payload
+collisions	Instant (<5ms)	Deterministic CYP collision data, phenoconversions, unmatched drugs
+reasoning	During LLM	Streaming reasoning text chunks
+analysis	After LLM	Full result: summary, drug issues, recommendations, sources
+error	On failure	Error message
+done	End	Empty (stream complete)
+GET /api/drugs/search?q=war
+Returns: [{ "rxcui": "...", "name": "warfarin" }]
 
-## Deploy
-```bash
-npm i -g vercel
-vercel deploy
-```
+Environment Variables
+Variable	Required	Description
+GEMINI_API_KEY	Yes	Free at AI Studio
+CHROMA_URL	No	ChromaDB endpoint (default: http://localhost:8000)
+Prerequisites
+Node.js 18+
+npm 9+
+ChromaDB 0.4+ (optional, for RAG layer)
+Testing
+npm test              # Run all 20 unit tests
+npm run test:watch    # Watch mode for development
+The test suite validates the deterministic CYP collision detector (Layer 2) across 7 categories: edge cases, substrate+inhibitor collisions, substrate+inducer collisions, polypharmacy scenarios, phenoconversion, risk calculations, and output structure.
+
+Documentation
+Open PolyPGx_Documentation.html for the full project report. Open FutureScope.html for the development roadmap.
+
+Known Issues
+npm run build may fail under Turbopack due to an upstream ESM/CJS conflict with @chroma-core/default-embed. The development server (npm run dev) works correctly. For production deployment, use Webpack mode.
+
+License
+Built for HackPSU 2026. All rights reserved.
